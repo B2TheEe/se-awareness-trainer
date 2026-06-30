@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Email Header Analyse{% endblock %}
+{% block content %}
+<h2 class="mb-1">Email Header Analyse</h2>
+<p class="text-muted mb-2">Leer raw SMTP-headers lezen: SPF, DKIM, DMARC, Received-chain, Reply-To.</p>
+<div class="alert alert-secondary py-2 mb-4">
+    <i class="bi bi-lock"></i> <strong>Progressie:</strong> intermediate vrijgespeeld na {{ threshold }} beginner ≥50% · advanced na {{ threshold }} intermediate ≥50%
+</div>
+<div class="row g-3">
+{% for h in headers %}
+{% set locked = h.difficulty not in unlocked %}
+<div class="col-md-6 col-lg-4">
+    <div class="card h-100 {% if locked %}opacity-50{% endif %}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="badge badge-{{ h.difficulty }}">{{ h.difficulty }}</span>
+                <span class="badge bg-secondary">{{ h.category }}</span>
+                {% if locked %}<i class="bi bi-lock-fill text-warning"></i>{% endif %}
+            </div>
+            <h5>{{ h.subject }}</h5>
+            {% if locked %}
+            <p class="text-muted small"><em>Voltooi eerst {{ threshold }} {{ 'beginner' if h.difficulty == 'intermediate' else 'intermediate' }} oefeningen met ≥50%.</em></p>
+            {% else %}
+            <p class="text-muted small">{{ h.red_flags|length }} rode vlaggen in de headers.</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            {% if locked %}
+            <button class="btn btn-outline-secondary btn-sm w-100" disabled><i class="bi bi-lock"></i> Vergrendeld</button>
+            {% else %}
+            <a href="/headers/{{ h.id }}" class="btn btn-outline-success btn-sm w-100">Analyseer headers</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

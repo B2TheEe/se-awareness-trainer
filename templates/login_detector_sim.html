@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}Login Detector — {{ login.category }}{% endblock %}
+{% block content %}
+<style>
+.browser-chrome { background:#2d2d2d; border-radius:10px 10px 0 0; padding:10px 12px 0; }
+.browser-toolbar { background:#3c3c3c; border-radius:6px; padding:6px 10px; display:flex; align-items:center; gap:8px; margin-bottom:0; }
+.browser-dots span { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:4px; }
+.browser-url-bar { flex:1; background:#1e1e1e; border-radius:4px; padding:4px 10px; font-size:.85rem; font-family:monospace; cursor:pointer; border:2px solid transparent; }
+.browser-url-bar:hover, .browser-url-bar.selected { border-color:#ff4444; background:rgba(255,68,68,0.1); }
+.ssl-icon { font-size:1rem; cursor:pointer; border:2px dashed transparent; border-radius:4px; padding:2px 4px; }
+.ssl-icon:hover, .ssl-icon.selected { border-color:#ff4444; background:rgba(255,68,68,0.1); }
+.browser-content { background:#fff; border-radius:0 0 10px 10px; min-height:380px; padding:32px; color:#333; }
+.fake-logo { font-size:1.8rem; font-weight:300; letter-spacing:-1px; margin-bottom:24px; }
+.fake-form input { display:block; width:100%; max-width:340px; padding:10px 12px; border:1px solid #dadce0; border-radius:4px; margin-bottom:12px; font-size:.95rem; background:#f8f9fa; color:#999; }
+.fake-form input:focus { outline:none; border-color:#1a73e8; }
+.fake-submit { background:#1a73e8; color:#fff; border:none; border-radius:4px; padding:10px 24px; font-size:.95rem; cursor:default; }
+.fake-footer { margin-top:20px; font-size:.75rem; color:#777; }
+.flag-element { cursor:pointer; border:2px dashed transparent; border-radius:3px; padding:1px 3px; }
+.flag-element:hover, .flag-element.selected { border-color:#ff4444; background:rgba(255,68,68,0.15); }
+</style>
+
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="/login-detector" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Terug</a>
+    <h2 class="mb-0">Login Detector — {{ login.category }}</h2>
+    <span class="badge badge-{{ login.difficulty }}">{{ login.difficulty }}</span>
+</div>
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> Klik op verdachte elementen in de browserbalk en op de pagina. Hoeveel rode vlaggen vind jij?
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="browser-chrome shadow">
+            <div class="browser-toolbar">
+                <div class="browser-dots">
+                    <span style="background:#ff5f56"></span>
+                    <span style="background:#ffbd2e"></span>
+                    <span style="background:#27c93f"></span>
+                </div>
+                <span class="ssl-icon" id="ssl-btn" data-flag="rf-ssl" onclick="toggleFlag(this)">
+                    {% if login.ssl_status == 'none' %}🔓{% elif login.ssl_status == 'warning' %}⚠️{% else %}🔒{% endif %}
+                </span>
+                <div class="browser-url-bar" id="url-btn" data-flag="rf-url" onclick="toggleFlag(this)">
+                    {{ login.browser_url }}
+                </div>
+            </div>
+            <div class="browser-content">
+                <div class="fake-logo">{{ login.logo_text }}</div>
+                <div class="fake-form">
+                    <p style="font-size:.95rem; margin-bottom:16px;">Sign in</p>
+                    {% for field in login.form_fields %}
+                    <span class="flag-element" data-flag="rf-{% if 'TAN' in field or 'BSN' in field or 'Password' in field and loop.index == 1 %}form{% elif 'TAN' in field %}tan{% else %}form{% endif %}" onclick="toggleFlag(this)">
+                        <input type="text" placeholder="{{ field }}" disabled>
+                    </span>
+                    {% endfor %}
+                    <button class="fake-submit mt-2">{{ login.submit_text }}</button>
+                </div>
+                <div class="fake-footer">
+                    <span class="flag-element" data-flag="rf-footer" onclick="toggleFlag(this)">
+                        {{ login.footer_text }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-card" class="card mt-4 d-none">
+            <div class="card-body text-center">
+                <div id="score-circle" class="score-circle mb-3"></div>
+                <h4 id="result-title"></h4>
+                <div id="bonus-badges" class="mb-2"></div>
+                <p id="result-explanation" class="text-muted text-start"></p>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <div class="card bg-success bg-opacity-10 border-success">
+                            <div class="card-body p-2"><small class="text-success">Gevonden</small><div id="correct-flags"></div></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-danger bg-opacity-10 border-danger">
+                            <div class="card-body p-2"><small class="text-danger">Gemist</small><div id="missed-flags"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/login-detector" class="btn btn-outline-secondary me-2">Andere pagina's</a>
+                    <a href="/stats" class="btn btn-outline-info">Statistieken</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card border-warning mb-3">
+            <div class="card-body d-flex align-items-center gap-3 py-2">
+                <div class="text-muted small">Tijd</div>
+                <div id="timer-display" style="font-size:1.6rem;font-weight:700;min-width:3ch;">{{ time_limit }}</div>
+                <div class="progress flex-grow-1" style="height:8px;">
+                    <div id="timer-bar" class="progress-bar bg-warning" style="width:100%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-2">
+            <div class="card-header">Geselecteerde vlaggen</div>
+            <div class="card-body"><div id="selected-list" class="text-muted small">Nog niets...</div></div>
+        </div>
+        <button id="hint-btn" class="btn btn-outline-warning w-100 mb-2" onclick="useHint()">
+            <i class="bi bi-lightbulb"></i> Hint <small>(-50%)</small>
+        </button>
+        <div id="hint-box" class="alert alert-warning py-2 d-none small">
+            <i class="bi bi-lightbulb-fill"></i> {{ login.hint }}
+        </div>
+        <button id="submit-btn" class="btn btn-primary w-100" onclick="submitFlags()">
+            Analyseer <span id="selected-count">(0)</span>
+        </button>
+    </div>
+</div>
+
+<script>
+const selected = new Set();
+const TIME_LIMIT = {{ time_limit }};
+let timeRemaining = TIME_LIMIT;
+let timerInterval = null;
+let submitted = false;
+let hintUsed = false;
+
+const flagLabels = {
+    {% for rf in login.red_flags %}'{{ rf.id }}': '{{ rf.text|replace("'","\\'") }}',{% endfor %}
+    'rf-url': 'URL-balk', 'rf-ssl': 'SSL-icoon', 'rf-form': 'Formulierveld(en)', 'rf-footer': 'Footer-tekst',
+    'rf-sub': 'Subdomein-truc', 'rf-pass': 'Wachtwoord op zelfde pagina', 'rf-tan': 'TAN-code bij inloggen',
+    'rf-logo': 'Logo/opmaak', 'rf-phone': 'Telefoonnummer', 'rf-kvk': 'KVK-nummer'
+};
+
+function startTimer() {
+    const display = document.getElementById('timer-display');
+    const bar = document.getElementById('timer-bar');
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        display.textContent = timeRemaining;
+        bar.style.width = (timeRemaining / TIME_LIMIT * 100) + '%';
+        if (timeRemaining <= 10) { display.style.color = '#dc3545'; bar.className = 'progress-bar bg-danger'; }
+        else if (timeRemaining <= 30) { display.style.color = '#fd7e14'; bar.className = 'progress-bar bg-warning'; }
+        if (timeRemaining <= 0) { clearInterval(timerInterval); submitFlags(true); }
+    }, 1000);
+}
+
+function toggleFlag(el) {
+    if (submitted) return;
+    const flag = el.dataset.flag;
+    if (selected.has(flag)) { selected.delete(flag); el.classList.remove('selected'); }
+    else { selected.add(flag); el.classList.add('selected'); }
+    updateSidebar();
+}
+
+function updateSidebar() {
+    document.getElementById('selected-count').textContent = `(${selected.size})`;
+    const list = document.getElementById('selected-list');
+    list.innerHTML = selected.size === 0 ? '<span class="text-muted">Nog niets...</span>' :
+        [...selected].map(f => `<div class="badge bg-danger mb-1 d-block text-wrap text-start">${flagLabels[f] || f}</div>`).join('');
+}
+
+function useHint() {
+    if (hintUsed || submitted) return;
+    hintUsed = true;
+    document.getElementById('hint-btn').disabled = true;
+    document.getElementById('hint-btn').innerHTML = '<i class="bi bi-lightbulb-fill"></i> Hint gebruikt';
+    document.getElementById('hint-box').classList.remove('d-none');
+}
+
+function submitFlags(timedOut = false) {
+    if (submitted) return;
+    submitted = true;
+    clearInterval(timerInterval);
+    document.getElementById('submit-btn').disabled = true;
+    fetch('/login-detector/{{ login.id }}/submit', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({selected: [...selected], time_remaining: timeRemaining, hint_used: hintUsed})
+    }).then(r => r.json()).then(data => showResult(data, timedOut));
+}
+
+function showResult(data, timedOut) {
+    document.querySelectorAll('.flag-element, .browser-url-bar, .ssl-icon').forEach(el => el.style.pointerEvents = 'none');
+    const pct = data.pct;
+    const circle = document.getElementById('score-circle');
+    circle.textContent = pct + '%';
+    circle.className = 'score-circle mb-3 ' + (pct >= 70 ? 'score-high' : pct >= 40 ? 'score-mid' : 'score-low');
+    const prefix = timedOut ? 'Tijd verstreken! ' : '';
+    document.getElementById('result-title').textContent = prefix + (pct >= 70 ? `Goed! ${data.total_score}/${data.max_score}` : pct >= 40 ? `Aardig! ${data.total_score}/${data.max_score}` : `Meer oefening. ${data.total_score}/${data.max_score}`);
+    const badges = [];
+    if (data.hint_used) badges.push(`<span class="badge bg-warning text-dark">Hint gebruikt</span>`);
+    if (data.time_bonus > 0) badges.push(`<span class="badge bg-success">+${data.time_bonus} tijdbonus</span>`);
+    document.getElementById('bonus-badges').innerHTML = badges.join(' ');
+    document.getElementById('result-explanation').textContent = data.explanation;
+    document.getElementById('correct-flags').innerHTML = data.correct_flags.length === 0 ? '<small class="text-muted">Geen</small>' : data.correct_flags.map(f => `<small class="d-block">✓ ${f.text} (+${f.points})</small>`).join('');
+    document.getElementById('missed-flags').innerHTML = data.missed_flags.length === 0 ? '<small class="text-muted">Geen</small>' : data.missed_flags.map(f => `<small class="d-block">✗ ${f.text}</small>`).join('');
+    document.getElementById('result-card').classList.remove('d-none');
+    document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
+}
+
+startTimer();
+</script>
+{% endblock %}

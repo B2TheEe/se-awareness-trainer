@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "difficulty": "beginner",
+    "category": "Microsoft",
+    "hint": "Kijk heel goed naar het domein in de adresbalk — niet naar het icoon of de paginaopmaak.",
+    "browser_url": "http://microsoft-login.verify-account.com/signin",
+    "ssl_status": "none",
+    "page_title": "Sign in to your Microsoft account",
+    "logo_text": "Microsoft",
+    "form_fields": ["Email, phone, or Skype", "Password"],
+    "submit_text": "Sign in",
+    "footer_text": "© 2026 Microsoft Corporation. All rights reserved.",
+    "extra_text": "No account? Create one! Forgot password? Sign in with Windows Hello",
+    "red_flags": [
+      {"id": "rf-url",  "text": "Domein is verify-account.com, niet microsoft.com of login.microsoftonline.com", "points": 35},
+      {"id": "rf-ssl",  "text": "Geen HTTPS (http://) — verbinding is onbeveiligd, geen slotje", "points": 30},
+      {"id": "rf-pass", "text": "Wachtwoord gevraagd op dezelfde pagina als email — Microsoft doet dit in 2 stappen", "points": 20},
+      {"id": "rf-sub",  "text": "Subdomein 'microsoft-login' probeert legitiem te lijken maar het echte domein is verify-account.com", "points": 15}
+    ],
+    "explanation": "Echte Microsoft-login staat altijd op login.microsoftonline.com of login.live.com, altijd met HTTPS. Controleer het domein — niet de opmaak van de pagina."
+  },
+  {
+    "id": 2,
+    "difficulty": "intermediate",
+    "category": "ING Bank",
+    "hint": "Bekijk het volledige domein in de adresbalk — van links naar rechts. Wat is het root-domein?",
+    "browser_url": "https://ing.nl.secure-banking-login.com/mijn-ing",
+    "ssl_status": "valid",
+    "page_title": "Mijn ING — Inloggen",
+    "logo_text": "ING",
+    "form_fields": ["Gebruikersnaam", "Wachtwoord", "TAN-code"],
+    "submit_text": "Inloggen",
+    "footer_text": "© 2026 ING Bank N.V. | Privacybeleid | Cookies | KVK 33031431",
+    "extra_text": "Veilig bankieren met ING. Altijd bereikbaar via 020 22 888 00.",
+    "red_flags": [
+      {"id": "rf-url",  "text": "Root-domein is secure-banking-login.com, niet ing.nl — 'ing.nl' is slechts een subdomein", "points": 35},
+      {"id": "rf-tan",  "text": "TAN-code gevraagd bij inloggen — ING vraagt TAN alleen bij transacties, niet bij inloggen", "points": 30},
+      {"id": "rf-sub",  "text": "Subdomein-truc: 'ing.nl.secure-banking-login.com' — het echte domein staat rechts van de laatste punt voor '/mijn-ing'", "points": 25},
+      {"id": "rf-kvk",  "text": "KVK-nummer in footer klopt, maar dit kopiëren aanvallers makkelijk — verifieert niets", "points": 10}
+    ],
+    "explanation": "Subdomein-misleiding is een geavanceerde techniek. Het root-domein (na de laatste punt voor de slash) is altijd secure-banking-login.com. Echt ING staat op ing.nl. Let altijd op het root-domein, niet op subdomeinen."
+  },
+  {
+    "id": 3,
+    "difficulty": "intermediate",
+    "category": "DigiD",
+    "hint": "Vergelijk het domein teken voor teken met digid.nl — let op homoglyphs (tekens die op letters lijken).",
+    "browser_url": "https://dlgid.nl/inloggen",
+    "ssl_status": "valid",
+    "page_title": "DigiD — Inloggen",
+    "logo_text": "DigiD",
+    "form_fields": ["Gebruikersnaam", "Wachtwoord"],
+    "submit_text": "Inloggen",
+    "footer_text": "DigiD is een dienst van Logius, onderdeel van het ministerie van Binnenlandse Zaken.",
+    "extra_text": "Geen DigiD? Vraag DigiD aan. Hulp nodig? Bel 088 1236 555.",
+    "red_flags": [
+      {"id": "rf-url",  "text": "Domein is dlgid.nl, niet digid.nl — de 'i' en 'g' zijn omgewisseld (typosquat)", "points": 40},
+      {"id": "rf-ssl",  "text": "SSL-certificaat is geldig maar voor het verkeerde domein (dlgid.nl, niet digid.nl)", "points": 25},
+      {"id": "rf-logo", "text": "Logo en opmaak zijn gekopieerd — dit verifieert het domein niet", "points": 20},
+      {"id": "rf-phone","text": "Telefoonnummer 088 1236 555 klopt voor DigiD, maar aanvallers kopiëren dit makkelijk", "points": 15}
+    ],
+    "explanation": "Typosquatting verwisselt letters in een domeinnaam. dlgid.nl vs digid.nl is bij snel lezen bijna onzichtbaar. SSL-certificaten zijn gratis verkrijgbaar voor elk domein — een groen slotje betekent alleen versleuteling, niet legitimiteit."
+  },
+  {
+    "id": 4,
+    "difficulty": "advanced",
+    "category": "Google",
+    "hint": "Zoom in op het domein in de adresbalk. Zijn alle tekens echt wat ze lijken te zijn?",
+    "browser_url": "https://accounts.goog1e.com/signin/v2/identifier",
+    "ssl_status": "valid",
+    "page_title": "Sign in — Google Accounts",
+    "logo_text": "Google",
+    "form_fields": ["Email or phone"],
+    "submit_text": "Next",
+    "footer_text": "© 2026 Google LLC | Privacy | Terms | Help",
+    "extra_text": "Forgot email? Not your computer? Use Guest mode to sign in privately.",
+    "red_flags": [
+      {"id": "rf-url",   "text": "Domein is goog1e.com — de 'l' in 'google' is vervangen door het cijfer '1' (homoglyph)", "points": 40},
+      {"id": "rf-ssl",   "text": "Geldig SSL-certificaat voor goog1e.com — slotje bewijst niets over legitimiteit", "points": 25},
+      {"id": "rf-path",  "text": "Pad /signin/v2/identifier ziet er legitiem uit maar het domein klopt niet", "points": 20},
+      {"id": "rf-logo",  "text": "Google-logo, kleuren en opmaak zijn pixel-perfect gekopieerd — onbetrouwbaar als verificatie", "points": 15}
+    ],
+    "explanation": "Homoglyph-aanvallen vervangen tekens door visueel identieke alternatieven (l→1, o→0, rn→m). In de adresbalk zijn ze nauwelijks zichtbaar. Gebruik een wachtwoordmanager — die valt niet voor homoglyphs want die vergelijkt het exacte domein."
+  }
+]

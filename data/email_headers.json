@@ -1,0 +1,49 @@
+[
+  {
+    "id": 1,
+    "difficulty": "beginner",
+    "category": "SPF Fail",
+    "subject": "Uw account is geblokkeerd",
+    "hint": "Zoek naar de Authentication-Results header — wat zegt die over SPF?",
+    "headers": "Delivered-To: jouw.naam@bedrijf.nl\nReceived: from mail.phish-server.ru (mail.phish-server.ru [185.220.101.47])\n        by mx.bedrijf.nl with ESMTP id a12si3456789pjt.88\n        for <jouw.naam@bedrijf.nl>; Mon, 30 Jun 2026 09:14:22 +0200\nReceived-SPF: fail (mx.bedrijf.nl: domain of noreply@rabobank.nl does not\n        designate 185.220.101.47 as permitted sender)\n        client-ip=185.220.101.47\nAuthentication-Results: mx.bedrijf.nl;\n        spf=fail (sender IP is 185.220.101.47)\n          smtp.mailfrom=noreply@rabobank.nl;\n        dkim=none (message not signed)\n        header.i=@rabobank.nl;\n        dmarc=fail action=none\n          header.from=rabobank.nl\nFrom: Rabobank Klantenservice <noreply@rabobank.nl>\nReply-To: klantenservice@rabobank-helpdesk.net\nTo: jouw.naam@bedrijf.nl\nDate: Mon, 30 Jun 2026 09:14:20 +0200\nSubject: Uw account is geblokkeerd\nMessage-ID: <20260630091420.1A2B3C4D5E@phish-server.ru>\nMIME-Version: 1.0\nContent-Type: text/html; charset=UTF-8",
+    "red_flags": [
+      {"id": "rh1", "text": "SPF: fail — IP 185.220.101.47 is niet geautoriseerd om namens rabobank.nl te sturen", "points": 30, "line_hint": "Received-SPF"},
+      {"id": "rh2", "text": "DKIM: none — bericht is niet digitaal ondertekend door Rabobank", "points": 25, "line_hint": "dkim=none"},
+      {"id": "rh3", "text": "DMARC: fail — gecombineerde SPF+DKIM-check mislukt", "points": 20, "line_hint": "dmarc=fail"},
+      {"id": "rh4", "text": "Reply-To domein (rabobank-helpdesk.net) verschilt van From domein (rabobank.nl)", "points": 15, "line_hint": "Reply-To"},
+      {"id": "rh5", "text": "Message-ID bevat phish-server.ru — echte Rabobank-servers hebben een rabobank.nl Message-ID", "points": 10, "line_hint": "Message-ID"}
+    ],
+    "explanation": "SPF, DKIM en DMARC zijn e-mailauthenticatieprotocollen. SPF=fail betekent dat de verzendende server niet geautoriseerd is. DKIM=none betekent geen digitale handtekening. DMARC=fail combineert beide. Legitieme banken hebben altijd alle drie correct ingesteld."
+  },
+  {
+    "id": 2,
+    "difficulty": "intermediate",
+    "category": "Header Spoofing",
+    "subject": "Re: Q4 Budget Review",
+    "hint": "Vergelijk de Received-from IP-locatie met waar de vermeende afzender vandaan zou moeten sturen.",
+    "headers": "Delivered-To: finance@jouwbedrijf.nl\nReceived: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])\n        by mx.jouwbedrijf.nl with ESMTPS id b7si9871234abc.12\n        for <finance@jouwbedrijf.nl>; Mon, 30 Jun 2026 14:33:01 +0200\nReceived: from [192.168.1.105] (unknown [196.1.147.83])\n        by smtp.gmail.com with ESMTPSA id d3sm4567890pjb.5\n        for <finance@jouwbedrijf.nl>\nReceived-SPF: pass (mx.jouwbedrijf.nl: domain of j.bakker@jouwbedrijf.co\n        designates 209.85.128.52 as permitted sender)\nAuthentication-Results: mx.jouwbedrijf.nl;\n        spf=pass smtp.mailfrom=j.bakker@jouwbedrijf.co;\n        dkim=pass header.i=@jouwbedrijf.co;\n        dmarc=pass header.from=jouwbedrijf.co\nFrom: Jan Bakker <j.bakker@jouwbedrijf.co>\nTo: finance@jouwbedrijf.nl\nDate: Mon, 30 Jun 2026 14:32:58 +0200\nSubject: Re: Q4 Budget Review\nX-Originating-IP: 196.1.147.83\nX-Mailer: iPhone Mail (iOS 17.4)\nMessage-ID: <20260630143258.AB12CD34EF@jouwbedrijf.co>",
+    "red_flags": [
+      {"id": "rh1", "text": "From-domein is jouwbedrijf.co, niet jouwbedrijf.com — typosquat (SPF pass voor het NEPPE domein)", "points": 35, "line_hint": "From:"},
+      {"id": "rh2", "text": "X-Originating-IP 196.1.147.83 is een Nigeriaans IP-adres — verdacht voor een Nederlandse directeur", "points": 30, "line_hint": "X-Originating-IP"},
+      {"id": "rh3", "text": "SPF/DKIM/DMARC zijn 'pass' maar voor het NEPPE domein jouwbedrijf.co, niet jouwbedrijf.com", "points": 25, "line_hint": "spf=pass"},
+      {"id": "rh4", "text": "Received-from toont [192.168.1.105] (privé-IP) via onbekend extern IP — inconsistent met zakelijk gebruik", "points": 10, "line_hint": "Received: from [192.168"}
+    ],
+    "explanation": "BEC-aanvallers registreren een typosquat-domein (jouwbedrijf.co) en configureren er correcte SPF/DKIM/DMARC voor — waardoor authenticatiechecks PASS laten zien. Controleer het exacte From-domein en de X-Originating-IP. Een Nigeriaans IP voor een Nederlandse directeur is een harde rode vlag."
+  },
+  {
+    "id": 3,
+    "difficulty": "advanced",
+    "category": "DKIM Replay",
+    "subject": "Beveiligingsmelding: verdachte activiteit",
+    "hint": "Kijk naar de Received-tijdstempels en de d= waarde in de DKIM-Signature.",
+    "headers": "Delivered-To: admin@jouwbedrijf.nl\nReceived: from mail.legitimebedrijf.nl (mail.legitimebedrijf.nl [93.184.216.34])\n        by mx.jouwbedrijf.nl with ESMTPS id x9si1234567abc.1\n        for <admin@jouwbedrijf.nl>; Mon, 30 Jun 2026 23:47:12 +0200\nReceived: from localhost (localhost [127.0.0.1])\n        by mail.legitimebedrijf.nl (Postfix) with ESMTP id A1B2C3D4E5\n        Mon, 30 Jun 2026 23:47:10 +0200 (CEST)\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\n        d=microsoft.com; s=selector2;\n        h=From:To:Subject:Date:Message-ID;\n        bh=abc123def456ghi789jkl012mno345pqr678stu901=;\n        b=XYZsignaturevalueABCDEFGHIJKLMNOP==\nAuthentication-Results: mx.jouwbedrijf.nl;\n        spf=fail smtp.mailfrom=admin@legitimebedrijf.nl;\n        dkim=pass (signature was valid) header.d=microsoft.com;\n        dmarc=fail (p=reject) header.from=microsoft.com\nFrom: Microsoft Security <security@microsoft.com>\nTo: admin@jouwbedrijf.nl\nDate: Mon, 30 Jun 2026 23:47:08 +0200\nSubject: Beveiligingsmelding: verdachte activiteit\nX-Originating-IP: 93.184.216.34\nMessage-ID: <replay-20260630-A1B2C3D4@legitimebedrijf.nl>\nX-Original-To: other-victim@example.com",
+    "red_flags": [
+      {"id": "rh1", "text": "DMARC: fail (p=reject) ondanks DKIM pass — DKIM-domein (microsoft.com) matcht niet met From-domein via SPF", "points": 30, "line_hint": "dmarc=fail"},
+      {"id": "rh2", "text": "SPF: fail — mail komt van legitimebedrijf.nl, niet microsoft.com", "points": 25, "line_hint": "spf=fail"},
+      {"id": "rh3", "text": "X-Original-To toont ander slachtoffer (other-victim@example.com) — dit is een bulk-aanval of doorgestuurd bericht", "points": 20, "line_hint": "X-Original-To"},
+      {"id": "rh4", "text": "Message-ID bevat legitimebedrijf.nl, niet microsoft.com — de werkelijke verzendserver lekt hier", "points": 15, "line_hint": "Message-ID"},
+      {"id": "rh5", "text": "DKIM d=microsoft.com met valide handtekening maar afkomstig van legitimebedrijf.nl — mogelijke DKIM replay-aanval", "points": 10, "line_hint": "d=microsoft.com"}
+    ],
+    "explanation": "DKIM-replay hergebruikt een gestolen geldige DKIM-handtekening van een legitieme email. De handtekening klopt technisch, maar DMARC mislukt omdat SPF faalt. DMARC vereist dat SPF óf DKIM het From-domein afdekken én het werkelijk overeenkomt. Controleer altijd alle drie: SPF + DKIM + DMARC."
+  }
+]

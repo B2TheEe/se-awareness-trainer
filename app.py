@@ -217,6 +217,136 @@ def scenario_submit(scenario_id):
     })
 
 
+@app.route('/login-detector')
+def login_detector_list():
+    logins = load_json('fake_logins.json')
+    unlocked = get_unlock_status('login')
+    return render_template('login_detector_list.html', logins=logins, unlocked=unlocked,
+                           threshold=UNLOCK_THRESHOLD)
+
+
+@app.route('/login-detector/<int:login_id>')
+def login_detector_sim(login_id):
+    logins = load_json('fake_logins.json')
+    login = next((l for l in logins if l['id'] == login_id), None)
+    if not login:
+        return 'Niet gevonden', 404
+    unlocked = get_unlock_status('login')
+    if login['difficulty'] not in unlocked:
+        return render_template('locked.html', difficulty=login['difficulty'],
+                               quiz_type='login-detector', threshold=UNLOCK_THRESHOLD), 403
+    time_limit = DIFFICULTY_TIME[login['difficulty']]
+    return render_template('login_detector_sim.html', login=login, time_limit=time_limit)
+
+
+@app.route('/login-detector/<int:login_id>/submit', methods=['POST'])
+def login_detector_submit(login_id):
+    logins = load_json('fake_logins.json')
+    login = next((l for l in logins if l['id'] == login_id), None)
+    if not login:
+        return jsonify({'error': 'not found'}), 404
+
+    data = request.json
+    selected = data.get('selected', [])
+    time_remaining = max(0, int(data.get('time_remaining', 0)))
+    hint_used = bool(data.get('hint_used', False))
+
+    all_flag_ids = {rf['id'] for rf in login['red_flags']}
+    correct = set(selected) & all_flag_ids
+    wrong = set(selected) - all_flag_ids
+
+    score = sum(rf['points'] for rf in login['red_flags'] if rf['id'] in correct)
+    penalty = len(wrong) * 10
+    score = max(0, score - penalty)
+    max_score = sum(rf['points'] for rf in login['red_flags'])
+    effective_max = max_score // 2 if hint_used else max_score
+    time_bonus = min(20, time_remaining // 6) if score > 0 else 0
+    total_score = min(score + time_bonus, effective_max)
+
+    with get_db() as conn:
+        conn.execute(
+            'INSERT INTO scores (quiz_type, item_id, difficulty, score, max_score, timestamp) VALUES (?,?,?,?,?,?)',
+            ('login', login_id, login['difficulty'], total_score, effective_max,
+             datetime.utcnow().isoformat())
+        )
+        conn.commit()
+
+    return jsonify({
+        'score': score, 'time_bonus': time_bonus, 'total_score': total_score,
+        'max_score': effective_max, 'hint_used': hint_used,
+        'pct': round(total_score / effective_max * 100) if effective_max else 0,
+        'correct_flags': [rf for rf in login['red_flags'] if rf['id'] in correct],
+        'missed_flags': [rf for rf in login['red_flags'] if rf['id'] not in correct],
+        'wrong_count': len(wrong),
+        'explanation': login['explanation']
+    })
+
+
+@app.route('/headers')
+def headers_list():
+    headers = load_json('email_headers.json')
+    unlocked = get_unlock_status('headers')
+    return render_template('headers_list.html', headers=headers, unlocked=unlocked,
+                           threshold=UNLOCK_THRESHOLD)
+
+
+@app.route('/headers/<int:header_id>')
+def headers_sim(header_id):
+    headers = load_json('email_headers.json')
+    header = next((h for h in headers if h['id'] == header_id), None)
+    if not header:
+        return 'Niet gevonden', 404
+    unlocked = get_unlock_status('headers')
+    if header['difficulty'] not in unlocked:
+        return render_template('locked.html', difficulty=header['difficulty'],
+                               quiz_type='headers', threshold=UNLOCK_THRESHOLD), 403
+    time_limit = DIFFICULTY_TIME[header['difficulty']]
+    return render_template('headers_sim.html', header=header, time_limit=time_limit)
+
+
+@app.route('/headers/<int:header_id>/submit', methods=['POST'])
+def headers_submit(header_id):
+    headers = load_json('email_headers.json')
+    header = next((h for h in headers if h['id'] == header_id), None)
+    if not header:
+        return jsonify({'error': 'not found'}), 404
+
+    data = request.json
+    selected = data.get('selected', [])
+    time_remaining = max(0, int(data.get('time_remaining', 0)))
+    hint_used = bool(data.get('hint_used', False))
+
+    all_flag_ids = {rf['id'] for rf in header['red_flags']}
+    correct = set(selected) & all_flag_ids
+    wrong = set(selected) - all_flag_ids
+
+    score = sum(rf['points'] for rf in header['red_flags'] if rf['id'] in correct)
+    penalty = len(wrong) * 10
+    score = max(0, score - penalty)
+    max_score = sum(rf['points'] for rf in header['red_flags'])
+    effective_max = max_score // 2 if hint_used else max_score
+    time_bonus = min(20, time_remaining // 6) if score > 0 else 0
+    total_score = min(score + time_bonus, effective_max)
+
+    with get_db() as conn:
+        conn.execute(
+            'INSERT INTO scores (quiz_type, item_id, difficulty, score, max_score, timestamp) VALUES (?,?,?,?,?,?)',
+            ('headers', header_id, header['difficulty'], total_score, effective_max,
+             datetime.utcnow().isoformat())
+        )
+        conn.commit()
+
+    return jsonify({
+        'score': score, 'time_bonus': time_bonus, 'total_score': total_score,
+        'max_score': effective_max, 'hint_used': hint_used,
+        'pct': round(total_score / effective_max * 100) if effective_max else 0,
+        'correct_flags': [rf for rf in header['red_flags'] if rf['id'] in correct],
+        'missed_flags': [rf for rf in header['red_flags'] if rf['id'] not in correct],
+        'wrong_count': len(wrong),
+        'explanation': header['explanation']
+    })
+
+
 @app.route('/library')
 def library():
     tactics = [
@@ -275,8 +405,10 @@ def library():
 
 @app.route('/dashboard')
 def dashboard():
-    emails = {e['id']: e for e in load_json('phishing_emails.json')}
+    emails    = {e['id']: e for e in load_json('phishing_emails.json')}
     scenarios = {s['id']: s for s in load_json('scenarios.json')}
+    logins    = {l['id']: l for l in load_json('fake_logins.json')}
+    hdr_items = {h['id']: h for h in load_json('email_headers.json')}
 
     with get_db() as conn:
         rows = conn.execute('SELECT * FROM scores ORDER BY timestamp DESC').fetchall()
@@ -286,14 +418,13 @@ def dashboard():
     total_attempts = len(rows)
     recent_scores = []
 
+    type_map = {'phishing': emails, 'scenario': scenarios, 'login': logins, 'headers': hdr_items}
+
     for r in rows:
         pct = r['score'] / r['max_score'] * 100 if r['max_score'] else 0
-        if r['quiz_type'] == 'phishing':
-            item = emails.get(r['item_id'])
-            cat = item['category'] if item else 'Onbekend'
-        else:
-            item = scenarios.get(r['item_id'])
-            cat = item['category'] if item else 'Onbekend'
+        item_dict = type_map.get(r['quiz_type'], {})
+        item = item_dict.get(r['item_id'])
+        cat = item['category'] if item else 'Onbekend'
 
         if cat not in category_stats:
             category_stats[cat] = {'scores': [], 'quiz_type': r['quiz_type']}

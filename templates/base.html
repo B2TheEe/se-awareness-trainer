@@ -46,6 +46,8 @@
                 <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a></li>
                 <li class="nav-item"><a class="nav-link {% if '/phishing' in request.path %}active{% endif %}" href="/phishing">Phishing Sim</a></li>
                 <li class="nav-item"><a class="nav-link {% if '/scenarios' in request.path %}active{% endif %}" href="/scenarios">Scenario's</a></li>
+                <li class="nav-item"><a class="nav-link {% if '/login-detector' in request.path %}active{% endif %}" href="/login-detector">Login Detector</a></li>
+                <li class="nav-item"><a class="nav-link {% if '/headers' in request.path %}active{% endif %}" href="/headers">Headers</a></li>
                 <li class="nav-item"><a class="nav-link {% if '/library' in request.path %}active{% endif %}" href="/library">Bibliotheek</a></li>
                 <li class="nav-item"><a class="nav-link {% if '/dashboard' in request.path %}active{% endif %}" href="/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link {% if '/stats' in request.path %}active{% endif %}" href="/stats">Statistieken</a></li>

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Fake Login Detector{% endblock %}
+{% block content %}
+<h2 class="mb-1">Fake Login Detector</h2>
+<p class="text-muted mb-2">Herken nep-inlogschermen aan URL-balk, SSL-icoon en paginainhoud.</p>
+<div class="alert alert-secondary py-2 mb-4">
+    <i class="bi bi-lock"></i> <strong>Progressie:</strong> intermediate vrijgespeeld na {{ threshold }} beginner ≥50% · advanced na {{ threshold }} intermediate ≥50%
+</div>
+<div class="row g-3">
+{% for login in logins %}
+{% set locked = login.difficulty not in unlocked %}
+<div class="col-md-6">
+    <div class="card h-100 {% if locked %}opacity-50{% endif %}">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="badge badge-{{ login.difficulty }}">{{ login.difficulty }}</span>
+                <span class="badge bg-secondary">{{ login.category }}</span>
+                {% if locked %}<i class="bi bi-lock-fill text-warning"></i>{% endif %}
+            </div>
+            <h5>{{ login.category }} — Nep inlogpagina</h5>
+            <p class="text-muted small font-monospace">{{ login.browser_url[:55] }}{% if login.browser_url|length > 55 %}…{% endif %}</p>
+            {% if locked %}
+            <p class="text-muted small"><em>Voltooi eerst {{ threshold }} {{ 'beginner' if login.difficulty == 'intermediate' else 'intermediate' }} oefeningen met ≥50%.</em></p>
+            {% else %}
+            <p class="text-muted small">{{ login.red_flags|length }} rode vlaggen te vinden.</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            {% if locked %}
+            <button class="btn btn-outline-secondary btn-sm w-100" disabled><i class="bi bi-lock"></i> Vergrendeld</button>
+            {% else %}
+            <a href="/login-detector/{{ login.id }}" class="btn btn-outline-primary btn-sm w-100">Analyseer pagina</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
