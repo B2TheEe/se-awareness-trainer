@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Scenario — {{ scenario.title }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="/scenarios" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Terug</a>
+    <h2 class="mb-0">{{ scenario.title }}</h2>
+    <span class="badge badge-{{ scenario.difficulty }}">{{ scenario.difficulty }}</span>
+    <span class="badge bg-secondary">{{ scenario.category }}</span>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header"><i class="bi bi-camera-reels"></i> De situatie</div>
+            <div class="card-body">
+                <p class="lead">{{ scenario.scenario }}</p>
+            </div>
+        </div>
+
+        <h5 class="mb-3">Wat doe je?</h5>
+        <div id="options">
+            {% for option in scenario.options %}
+            <button class="option-btn" onclick="submitAnswer('{{ option.id }}', this)" data-id="{{ option.id }}">
+                <strong>{{ option.id|upper }}.</strong> {{ option.text }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <div id="result-card" class="card mt-4 d-none">
+            <div class="card-body">
+                <div id="result-icon" class="text-center mb-3" style="font-size:3rem"></div>
+                <h4 id="result-title" class="text-center"></h4>
+                <hr>
+                <p id="result-explanation"></p>
+                <div class="alert alert-info mt-3">
+                    <strong><i class="bi bi-lightbulb"></i> Gebruikte tactiek:</strong> <span id="result-tactic"></span>
+                    <br>
+                    <strong>Les:</strong> <span id="result-lesson"></span>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="/scenarios" class="btn btn-outline-secondary me-2">Andere scenario's</a>
+                    <a href="/stats" class="btn btn-outline-info">Statistieken</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let answered = false;
+
+function submitAnswer(answerId, btn) {
+    if (answered) return;
+    answered = true;
+
+    document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+    fetch('/scenarios/{{ scenario.id }}/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({answer: answerId})
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.classList.add(data.correct ? 'correct' : 'wrong');
+
+        document.getElementById('result-icon').textContent = data.correct ? '✅' : '❌';
+        document.getElementById('result-title').textContent = data.correct ? 'Correct!' : 'Niet correct';
+        document.getElementById('result-title').className = data.correct ? 'text-center text-success' : 'text-center text-danger';
+        document.getElementById('result-explanation').textContent = data.explanation;
+        document.getElementById('result-tactic').textContent = data.tactic;
+        document.getElementById('result-lesson').textContent = data.lesson;
+
+        document.getElementById('result-card').classList.remove('d-none');
+        document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
+    });
+}
+</script>
+{% endblock %}

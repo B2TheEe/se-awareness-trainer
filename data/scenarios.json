@@ -1,0 +1,142 @@
+[
+  {
+    "id": 1,
+    "difficulty": "beginner",
+    "category": "Pretexting",
+    "title": "De IT-medewerker",
+    "scenario": "Je werkt op kantoor. Een man in casual kleding loopt naar je toe en zegt: 'Hoi, ik ben van IT. We hebben een kritiek beveiligingsprobleem ontdekt op dit netwerk. Ik moet even snel inloggen op jouw computer om het te controleren. Kun je me even je wachtwoord geven of me inloggen?'",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je geeft hem je wachtwoord — hij is immers van IT.",
+        "correct": false,
+        "explanation": "Nooit wachtwoord geven, ook niet aan IT. Echte IT-medewerkers hebben eigen toegang of werken via officiële ticketsystemen."
+      },
+      {
+        "id": "b",
+        "text": "Je logt in zodat hij kan werken, maar kijkt mee.",
+        "correct": false,
+        "explanation": "Nog steeds problematisch — ongeautoriseerde toegang tot jouw account. Hij kan keyloggers installeren of data stelen terwijl je 'meekijkt'."
+      },
+      {
+        "id": "c",
+        "text": "Je vraagt om zijn medewerkers-ID en belt de IT-helpdesk om zijn identiteit te verifiëren.",
+        "correct": true,
+        "explanation": "Correct. Altijd identiteit verifiëren via een onafhankelijk kanaal. Echte IT-medewerkers begrijpen dit en werken mee."
+      },
+      {
+        "id": "d",
+        "text": "Je zegt dat je het druk hebt en hij later terug moet komen.",
+        "correct": false,
+        "explanation": "Uitstellen lost niets op. Als het een aanvaller is, komt hij terug op een moment dat je meer onder druk staat."
+      }
+    ],
+    "tactic": "Pretexting + Authority",
+    "lesson": "Verifieer altijd identiteit via een onafhankelijk kanaal. Urgentie en autoriteit zijn klassieke SE-tactieken om je verificatiestap over te laten slaan."
+  },
+  {
+    "id": 2,
+    "difficulty": "beginner",
+    "category": "Phishing",
+    "title": "De LinkedIn-recruiter",
+    "scenario": "Je ontvangt een LinkedIn-bericht: 'Hoi! Ik ben recruiter bij een top tech bedrijf. We zoeken iemand met jouw profiel. Stuur even je CV naar careers@techrecruit-jobs.net. We hebben ook een toffe opportunity beschrijving als PDF — download hier: bit.ly/job-offer-2026'",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je downloadt de PDF — gratis kansen bekijken kan geen kwaad.",
+        "correct": false,
+        "explanation": "PDF-bestanden kunnen malware bevatten (macro's, exploits). Nooit onbekende bestanden via verkorte URLs downloaden."
+      },
+      {
+        "id": "b",
+        "text": "Je stuurt je CV naar het opgegeven emailadres.",
+        "correct": false,
+        "explanation": "Het emaildomein (techrecruit-jobs.net) is verdacht. Je CV bevat persoonlijke info bruikbaar voor spear phishing of identiteitsdiefstal."
+      },
+      {
+        "id": "c",
+        "text": "Je zoekt het bedrijf op, vindt de officiële website, en neemt contact op via het officiële emailadres.",
+        "correct": true,
+        "explanation": "Correct. Verifieer via onafhankelijke kanalen. Als het bedrijf echt is, kun je hen direct bereiken via hun officiële site."
+      },
+      {
+        "id": "d",
+        "text": "Je reageert en vraagt om meer info voor je iets doet.",
+        "correct": false,
+        "explanation": "Reageren bevestigt dat je account actief is en maakt je een doelwit voor verdere manipulatie."
+      }
+    ],
+    "tactic": "Spear Phishing + Baiting",
+    "lesson": "Verkorte URLs en externe domeinen zijn rode vlaggen. Verifieer recruiters altijd via het officiële bedrijfskanaal voor je persoonlijke info deelt."
+  },
+  {
+    "id": 3,
+    "difficulty": "intermediate",
+    "category": "Vishing",
+    "title": "De bankmedewerker",
+    "scenario": "Je telefoon rinkelt. De beller zegt: 'Goedemiddag, u spreekt met Sanne van de fraudeafdeling van ING. We hebben verdachte transacties gezien op uw rekening. Om uw rekening te beveiligen moet ik uw rekeningnummer en de laatste 4 cijfers van uw pas verifiëren. Heeft u even een moment?' Het nummer dat belde lijkt op een ING-nummer.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je geeft de gevraagde info — de bank heeft je gebeld dus het is veilig.",
+        "correct": false,
+        "explanation": "Spoofing maakt het mogelijk elk telefoonnummer na te maken. De bank kan je bellen, maar jij kunt de identiteit van de beller niet verifiëren."
+      },
+      {
+        "id": "b",
+        "text": "Je geeft alleen het rekeningnummer, niet de pincode.",
+        "correct": false,
+        "explanation": "Rekeningnummer alleen al is bruikbaar voor fraude. Deel nooit accountgegevens via inkomende gesprekken."
+      },
+      {
+        "id": "c",
+        "text": "Je beëindigt het gesprek, zoekt zelf het officiële ING-nummer op, en belt terug.",
+        "correct": true,
+        "explanation": "Correct. Beëindig het gesprek en bel terug via het officiële nummer van de bank's website of de achterkant van je bankpas. Echte banken vragen nooit gevoelige info via inkomende oproepen."
+      },
+      {
+        "id": "d",
+        "text": "Je vraagt de naam van de medewerker en haar personeelsnummer.",
+        "correct": false,
+        "explanation": "Aanvallers geven makkelijk valse namen en nummers. Dat verifieert niets — bel zelf terug via officieel kanaal."
+      }
+    ],
+    "tactic": "Vishing + Caller ID Spoofing",
+    "lesson": "Telefoonnummers zijn te spoofen. Banken vragen nooit gevoelige info via inkomende gesprekken. Altijd ophangen en zelf terugbellen via officieel nummer."
+  },
+  {
+    "id": 4,
+    "difficulty": "advanced",
+    "category": "Tailgating",
+    "title": "De bezorger",
+    "scenario": "Je werkt op kantoor met toegangspasjes. Een man met dozen in zijn handen staat bij de beveiligde deur. Hij zegt: 'Hé, kun je de deur even open houden? Mijn handen zitten vol en mijn pas zit in mijn zak.' Hij heeft een uniform aan dat er officieel uitziet.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je houdt de deur open — het is duidelijk een bezorger.",
+        "correct": false,
+        "explanation": "Uniformen zijn makkelijk te kopen. Tailgating is een van de meest gebruikte fysieke SE-technieken. Iedereen moet zelf authenticeren."
+      },
+      {
+        "id": "b",
+        "text": "Je houdt de deur open maar begeleidt hem naar de receptie.",
+        "correct": false,
+        "explanation": "Beter, maar je hebt nog steeds ongeautoriseerde toegang verleend zonder verificatie. Receptie moet de toegang regelen vóór binnenkomst."
+      },
+      {
+        "id": "c",
+        "text": "Je zegt vriendelijk dat hij zich bij de receptie moet melden via de intercom, en doet de deur dicht.",
+        "correct": true,
+        "explanation": "Correct. Elke bezoeker moet authenticeren via officieel kanaal. Vriendelijkheid + veiligheid sluiten elkaar niet uit."
+      },
+      {
+        "id": "d",
+        "text": "Je negeert hem en loopt door.",
+        "correct": false,
+        "explanation": "Iemand anders houdt dan misschien de deur open. Meld verdachte situaties altijd bij beveiliging/receptie."
+      }
+    ],
+    "tactic": "Tailgating + Sympathy",
+    "lesson": "Fysieke beveiliging is net zo belangrijk als digitale. Vol handen, uniform, vriendelijkheid — allemaal klassieke tailgating-tactieken. Elke persoon authenticeert zelf."
+  }
+]

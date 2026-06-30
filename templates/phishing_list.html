@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Phishing Simulator{% endblock %}
+{% block content %}
+<h2 class="mb-1">Phishing Simulator</h2>
+<p class="text-muted mb-4">Analyseer elke email en klik op alle rode vlaggen die je herkent.</p>
+
+<div class="row g-3">
+{% for email in emails %}
+<div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge badge-{{ email.difficulty }}">{{ email.difficulty }}</span>
+                <span class="text-muted small">{{ email.red_flags|length }} rode vlaggen</span>
+            </div>
+            <h5 class="card-title">{{ email.subject }}</h5>
+            <p class="text-muted small">Van: {{ email.sender_name }} &lt;{{ email.sender_email }}&gt;</p>
+            <p class="text-muted small">{{ email.body[:100] }}...</p>
+        </div>
+        <div class="card-footer">
+            <a href="/phishing/{{ email.id }}" class="btn btn-outline-danger btn-sm w-100">Analyseer Email</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

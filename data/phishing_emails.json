@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "difficulty": "beginner",
+    "subject": "Urgent: Verify your account immediately",
+    "sender_name": "IT Support",
+    "sender_email": "it-support@company-helpdesk.net",
+    "body": "Dear Employee,\n\nWe have detected unusual activity on your account. Your access will be suspended in 24 hours unless you verify your credentials immediately.\n\nClick here to verify: http://company-login.verify-now.tk/login\n\nIf you do not verify, your account will be permanently deleted.\n\nIT Support Team\nCompany Helpdesk",
+    "red_flags": [
+      {"id": "rf1", "text": "Suspicious sender domain (company-helpdesk.net, not your company domain)", "points": 20},
+      {"id": "rf2", "text": "Urgency tactic: '24 hours' deadline", "points": 15},
+      {"id": "rf3", "text": "Suspicious URL: verify-now.tk (not company domain)", "points": 25},
+      {"id": "rf4", "text": "Threat of account deletion to create panic", "points": 15},
+      {"id": "rf5", "text": "Generic greeting 'Dear Employee'", "points": 10},
+      {"id": "rf6", "text": "Requests credentials via link", "points": 15}
+    ],
+    "explanation": "Classic phishing email using urgency, fear, and a spoofed sender. Real IT departments never ask for credentials via email links."
+  },
+  {
+    "id": 2,
+    "difficulty": "intermediate",
+    "subject": "Your package could not be delivered - action required",
+    "sender_name": "PostNL Tracking",
+    "sender_email": "no-reply@postnl-tracking-update.com",
+    "body": "Dear customer,\n\nWe attempted to deliver your package (tracking: NL987654321) but were unable to complete delivery.\n\nTo reschedule delivery, a small fee of €2.95 is required.\n\nPay now: https://postnl-delivery.payment-secure.online/pay?id=NL987654321\n\nPayment must be completed within 48 hours or the package will be returned.\n\nPostNL Customer Service",
+    "red_flags": [
+      {"id": "rf1", "text": "Sender domain not official PostNL (postnl-tracking-update.com)", "points": 25},
+      {"id": "rf2", "text": "Payment URL not official PostNL domain (payment-secure.online)", "points": 25},
+      {"id": "rf3", "text": "Small fee request — classic smishing/phishing tactic", "points": 20},
+      {"id": "rf4", "text": "48-hour deadline creates false urgency", "points": 15},
+      {"id": "rf5", "text": "Generic 'Dear customer' — no name", "points": 15}
+    ],
+    "explanation": "Delivery phishing is extremely common in the Netherlands. Legitimate PostNL emails come from @postnl.nl and never request payment via external links."
+  },
+  {
+    "id": 3,
+    "difficulty": "advanced",
+    "subject": "Re: Q4 Budget Review - Action needed",
+    "sender_name": "Jan de Vries (CFO)",
+    "sender_email": "j.devries@your-company.co",
+    "body": "Hi,\n\nAs discussed in yesterday's meeting, I need you to process an urgent wire transfer of €45,000 to our new supplier before end of day.\n\nBank: IBAN NL91ABNA0417164300\nReference: Q4-SUPPLIER-2026\n\nThis is time-sensitive and needs to happen before the board meeting tomorrow. Please confirm once done. Keep this between us for now as the deal is not yet public.\n\nThanks,\nJan\n\nSent from iPhone",
+    "red_flags": [
+      {"id": "rf1", "text": "Domain is your-company.co not your-company.com (typosquat)", "points": 25},
+      {"id": "rf2", "text": "'Keep this between us' — isolation tactic", "points": 20},
+      {"id": "rf3", "text": "Extreme urgency: 'before end of day', 'before board meeting'", "points": 15},
+      {"id": "rf4", "text": "Wire transfer request via email — bypasses normal approval", "points": 25},
+      {"id": "rf5", "text": "CEO/CFO fraud (BEC) — impersonates executive", "points": 20},
+      {"id": "rf6", "text": "'As discussed' references fake meeting to build false familiarity", "points": 15}
+    ],
+    "explanation": "Business Email Compromise (BEC) — most costly SE attack. Impersonates executives, uses urgency and secrecy to bypass normal financial controls. Always verify wire transfers via phone to a known number."
+  }
+]

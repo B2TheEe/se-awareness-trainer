@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}SE Awareness Trainer — Home{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="fw-bold"><span style="color:#ff4444">Social Engineering</span> Awareness Trainer</h1>
+        <p class="text-muted">Leer aanvallen herkennen en de juiste reactie kiezen. Offline, lokaal, geen data naar buiten.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem">🎣</div>
+                <h4 class="mt-2">Phishing Simulator</h4>
+                <p class="text-muted">Analyseer nepemails en identificeer rode vlaggen. Punten per gevonden indicator.</p>
+                {% if stats.get('phishing') %}
+                <div class="badge bg-secondary mb-2">{{ stats.phishing.attempts }} pogingen — gem. {{ stats.phishing.avg_pct }}%</div>
+                {% endif %}
+                <a href="/phishing" class="btn btn-outline-danger d-block mt-2">Start Phishing Sim</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem">🎭</div>
+                <h4 class="mt-2">Scenario Quiz</h4>
+                <p class="text-muted">Realistische SE-situaties. Kies de juiste reactie en leer waarom andere opties falen.</p>
+                {% if stats.get('scenario') %}
+                <div class="badge bg-secondary mb-2">{{ stats.scenario.attempts }} pogingen — gem. {{ stats.scenario.avg_pct }}%</div>
+                {% endif %}
+                <a href="/scenarios" class="btn btn-outline-warning d-block mt-2">Start Scenario's</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <div style="font-size:3rem">📚</div>
+                <h4 class="mt-2">Tactiek Bibliotheek</h4>
+                <p class="text-muted">Diepgang over 7 SE-tactieken: signalen, voorbeelden, verdediging.</p>
+                <a href="/library" class="btn btn-outline-info d-block mt-2">Open Bibliotheek</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><strong>Wat is Social Engineering?</strong></div>
+    <div class="card-body">
+        <p>Social engineering exploiteert menselijk gedrag in plaats van technische kwetsbaarheden. Aanvallers gebruiken psychologische technieken zoals:</p>
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-exclamation-triangle text-warning"></i> <strong>Urgentie</strong> — "Handel nu of je verliest toegang"</li>
+                    <li><i class="bi bi-person-badge text-info"></i> <strong>Autoriteit</strong> — "Ik ben van IT / de directeur"</li>
+                    <li><i class="bi bi-heart text-danger"></i> <strong>Sympathie</strong> — "Help me even, ik heb het druk"</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-gift text-success"></i> <strong>Reciprociteit</strong> — "Ik doe iets voor jou, doe jij iets voor mij"</li>
+                    <li><i class="bi bi-people text-warning"></i> <strong>Social proof</strong> — "Iedereen doet dit zo"</li>
+                    <li><i class="bi bi-lock text-danger"></i> <strong>Schaarste</strong> — "Nog maar 1 plek / 24 uur"</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

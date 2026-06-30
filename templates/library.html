@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Tactiek Bibliotheek{% endblock %}
+{% block content %}
+<h2 class="mb-1">Tactiek Bibliotheek</h2>
+<p class="text-muted mb-4">Leer de 7 meest gebruikte social engineering tactieken kennen.</p>
+
+<div class="row g-4">
+{% for tactic in tactics %}
+<div class="col-md-6">
+    <div class="card h-100 tactic-card">
+        <div class="card-header d-flex align-items-center gap-2">
+            <span style="font-size:1.5rem">{{ tactic.icon }}</span>
+            <strong>{{ tactic.name }}</strong>
+        </div>
+        <div class="card-body">
+            <p>{{ tactic.description }}</p>
+
+            <h6 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Signalen</h6>
+            <ul class="small">
+                {% for sign in tactic.signs %}
+                <li>{{ sign }}</li>
+                {% endfor %}
+            </ul>
+
+            <h6 class="text-success"><i class="bi bi-shield-check"></i> Verdediging</h6>
+            <p class="small text-muted">{{ tactic.defense }}</p>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

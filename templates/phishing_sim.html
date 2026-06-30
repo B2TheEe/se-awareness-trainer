@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Phishing — {{ email.subject }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="/phishing" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Terug</a>
+    <h2 class="mb-0">Phishing Analyse</h2>
+    <span class="badge badge-{{ email.difficulty }}">{{ email.difficulty }}</span>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> Lees de email hieronder. Klik op alle teksten die je verdacht vindt. Elke rode vlag = punten. Foute selecties = strafpunten.
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="email-container p-0 mb-3 shadow">
+            <div class="email-header">
+                <div><strong>Van:</strong>
+                    <span class="red-flag-btn" data-flag="rf1" onclick="toggleFlag(this)">{{ email.sender_name }} &lt;{{ email.sender_email }}&gt;</span>
+                </div>
+                <div><strong>Onderwerp:</strong> {{ email.subject }}</div>
+            </div>
+            <div class="p-3" style="white-space: pre-wrap; line-height: 1.8;">
+                {% set body = email.body %}
+                {% for line in body.split('\n') %}
+                    {% if 'http' in line or 'bit.ly' in line or '.tk' in line or '.online' in line or '.net' in line %}
+                        <span class="red-flag-btn" data-flag="rf3" onclick="toggleFlag(this)">{{ line }}</span>
+                    {% elif '24 uur' in line or '48 uur' in line or 'onmiddellijk' in line or 'immediately' in line or 'urgent' in line|lower or 'voor einde' in line %}
+                        <span class="red-flag-btn" data-flag="rf2" onclick="toggleFlag(this)">{{ line }}</span>
+                    {% elif 'verwijderd' in line or 'deleted' in line or 'suspended' in line or 'geblokkeerd' in line %}
+                        <span class="red-flag-btn" data-flag="rf4" onclick="toggleFlag(this)">{{ line }}</span>
+                    {% elif line.startswith('Dear') or line.startswith('Beste') or line.startswith('Geachte') %}
+                        <span class="red-flag-btn" data-flag="rf5" onclick="toggleFlag(this)">{{ line }}</span>
+                    {% else %}
+                        {{ line }}
+                    {% endif %}
+                    {% if not loop.last %}&#10;{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="result-card" class="card d-none">
+            <div class="card-body text-center">
+                <div id="score-circle" class="score-circle mb-3"></div>
+                <h4 id="result-title"></h4>
+                <p id="result-explanation" class="text-muted"></p>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <div class="card bg-success bg-opacity-10 border-success">
+                            <div class="card-body p-2">
+                                <small class="text-success">Gevonden</small>
+                                <div id="correct-flags"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card bg-danger bg-opacity-10 border-danger">
+                            <div class="card-body p-2">
+                                <small class="text-danger">Gemist</small>
+                                <div id="missed-flags"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a href="/phishing" class="btn btn-outline-secondary me-2">Andere emails</a>
+                    <a href="/stats" class="btn btn-outline-info">Statistieken</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">Geselecteerde rode vlaggen</div>
+            <div class="card-body">
+                <div id="selected-list" class="text-muted small">Nog niets geselecteerd...</div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <button id="submit-btn" class="btn btn-danger w-100" onclick="submitFlags()">
+                Analyseer <span id="selected-count">(0 geselecteerd)</span>
+            </button>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body">
+                <small class="text-muted">Klik op verdachte tekstelementen in de email. Je kunt meerdere elementen selecteren.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const selected = new Set();
+const flagLabels = {
+    {% for rf in email.red_flags %}
+    '{{ rf.id }}': '{{ rf.text|replace("'", "\\'") }}',
+    {% endfor %}
+};
+
+function toggleFlag(el) {
+    const flag = el.dataset.flag;
+    if (selected.has(flag)) {
+        selected.delete(flag);
+        el.classList.remove('selected');
+    } else {
+        selected.add(flag);
+        el.classList.add('selected');
+    }
+    updateSidebar();
+}
+
+function updateSidebar() {
+    const list = document.getElementById('selected-list');
+    const count = document.getElementById('selected-count');
+    count.textContent = `(${selected.size} geselecteerd)`;
+    if (selected.size === 0) {
+        list.innerHTML = '<span class="text-muted">Nog niets geselecteerd...</span>';
+        return;
+    }
+    list.innerHTML = [...selected].map(f =>
+        `<div class="badge bg-danger mb-1 d-block text-wrap text-start">${flagLabels[f] || f}</div>`
+    ).join('');
+}
+
+function submitFlags() {
+    fetch('/phishing/{{ email.id }}/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({selected: [...selected]})
+    })
+    .then(r => r.json())
+    .then(data => showResult(data));
+}
+
+function showResult(data) {
+    document.getElementById('submit-btn').disabled = true;
+    document.querySelectorAll('.red-flag-btn').forEach(el => el.style.pointerEvents = 'none');
+
+    const pct = data.pct;
+    const circle = document.getElementById('score-circle');
+    circle.textContent = pct + '%';
+    circle.className = 'score-circle mb-3 ' + (pct >= 70 ? 'score-high' : pct >= 40 ? 'score-mid' : 'score-low');
+
+    document.getElementById('result-title').textContent =
+        pct >= 70 ? `Goed gedaan! ${data.score}/${data.max_score} punten` :
+        pct >= 40 ? `Aardig! ${data.score}/${data.max_score} punten` :
+        `Meer oefening nodig. ${data.score}/${data.max_score} punten`;
+
+    document.getElementById('result-explanation').textContent = data.explanation;
+
+    document.getElementById('correct-flags').innerHTML =
+        data.correct_flags.length === 0 ? '<small class="text-muted">Geen</small>' :
+        data.correct_flags.map(f => `<small class="d-block">✓ ${f.text} (+${f.points})</small>`).join('');
+
+    document.getElementById('missed-flags').innerHTML =
+        data.missed_flags.length === 0 ? '<small class="text-muted">Geen</small>' :
+        data.missed_flags.map(f => `<small class="d-block">✗ ${f.text}</small>`).join('');
+
+    document.getElementById('result-card').classList.remove('d-none');
+    document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
+}
+</script>
+{% endblock %}

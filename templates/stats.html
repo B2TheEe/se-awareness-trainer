@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Statistieken{% endblock %}
+{% block content %}
+<h2 class="mb-4">Mijn Statistieken</h2>
+
+{% if not recent %}
+<div class="alert alert-secondary">Nog geen scores. Start met <a href="/phishing">Phishing Sim</a> of <a href="/scenarios">Scenario's</a>.</div>
+{% else %}
+
+<div class="row g-3 mb-4">
+{% for row in totals %}
+<div class="col-md-4">
+    <div class="card">
+        <div class="card-body text-center">
+            <div class="text-muted small text-uppercase">{{ row['quiz_type'] }} — {{ row['difficulty'] }}</div>
+            <div style="font-size:2rem; font-weight:700;
+                color: {% if row['avg_pct'] >= 70 %}#28a745{% elif row['avg_pct'] >= 40 %}#fd7e14{% else %}#dc3545{% endif %}">
+                {{ row['avg_pct'] }}%
+            </div>
+            <div class="text-muted small">{{ row['attempts'] }} poging(en)</div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<div class="card">
+    <div class="card-header">Recente resultaten</div>
+    <div class="card-body p-0">
+        <table class="table table-dark table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Item</th>
+                    <th>Moeilijkheid</th>
+                    <th>Score</th>
+                    <th>%</th>
+                    <th>Tijd</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in recent %}
+            <tr>
+                <td>{{ row['quiz_type'] }}</td>
+                <td>#{{ row['item_id'] }}</td>
+                <td><span class="badge badge-{{ row['difficulty'] }}">{{ row['difficulty'] }}</span></td>
+                <td>{{ row['score'] }}/{{ row['max_score'] }}</td>
+                <td>
+                    {% set pct = (row['score'] / row['max_score'] * 100)|round|int %}
+                    <span style="color: {% if pct >= 70 %}#28a745{% elif pct >= 40 %}#fd7e14{% else %}#dc3545{% endif %}">
+                        {{ pct }}%
+                    </span>
+                </td>
+                <td class="text-muted small">{{ row['timestamp'][:16]|replace('T',' ') }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

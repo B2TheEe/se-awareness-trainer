@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SE Awareness Trainer{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: #0f1117; color: #e0e0e0; min-height: 100vh; }
+        .navbar { background: #1a1d2e !important; border-bottom: 1px solid #2d3154; }
+        .navbar-brand { color: #ff4444 !important; font-weight: 700; letter-spacing: 1px; }
+        .nav-link { color: #aaa !important; }
+        .nav-link:hover, .nav-link.active { color: #fff !important; }
+        .card { background: #1a1d2e; border: 1px solid #2d3154; color: #e0e0e0; }
+        .card-header { background: #141624; border-bottom: 1px solid #2d3154; }
+        .badge-beginner { background: #28a745; }
+        .badge-intermediate { background: #fd7e14; }
+        .badge-advanced { background: #dc3545; }
+        .email-container { background: #fff; color: #333; border-radius: 8px; font-family: Arial, sans-serif; }
+        .email-header { background: #f5f5f5; border-bottom: 1px solid #ddd; padding: 16px; border-radius: 8px 8px 0 0; }
+        .red-flag-btn { cursor: pointer; border: 2px dashed #555; border-radius: 4px; padding: 2px 4px; }
+        .red-flag-btn:hover { border-color: #ff4444; background: rgba(255,68,68,0.1); }
+        .red-flag-btn.selected { border-color: #ff4444; background: rgba(255,68,68,0.2); color: inherit; }
+        .tactic-card { border-left: 4px solid #ff4444; }
+        .score-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto; }
+        .score-high { background: rgba(40,167,69,0.2); border: 3px solid #28a745; color: #28a745; }
+        .score-mid { background: rgba(253,126,20,0.2); border: 3px solid #fd7e14; color: #fd7e14; }
+        .score-low { background: rgba(220,53,69,0.2); border: 3px solid #dc3545; color: #dc3545; }
+        .option-btn { background: #141624; border: 2px solid #2d3154; color: #e0e0e0; text-align: left; width: 100%; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+        .option-btn:hover { border-color: #4d5aff; background: #1e2240; }
+        .option-btn.correct { border-color: #28a745; background: rgba(40,167,69,0.15); }
+        .option-btn.wrong { border-color: #dc3545; background: rgba(220,53,69,0.15); }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/"><i class="bi bi-shield-exclamation"></i> SE Trainer</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link {% if '/phishing' in request.path %}active{% endif %}" href="/phishing">Phishing Sim</a></li>
+                <li class="nav-item"><a class="nav-link {% if '/scenarios' in request.path %}active{% endif %}" href="/scenarios">Scenario's</a></li>
+                <li class="nav-item"><a class="nav-link {% if '/library' in request.path %}active{% endif %}" href="/library">Bibliotheek</a></li>
+                <li class="nav-item"><a class="nav-link {% if '/stats' in request.path %}active{% endif %}" href="/stats">Statistieken</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container py-4">
+    {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
