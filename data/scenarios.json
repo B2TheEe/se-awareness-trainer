@@ -138,5 +138,180 @@
     ],
     "tactic": "Tailgating + Sympathy",
     "lesson": "Fysieke beveiliging is net zo belangrijk als digitale. Vol handen, uniform, vriendelijkheid — allemaal klassieke tailgating-tactieken. Elke persoon authenticeert zelf."
+  },
+  {
+    "id": 5,
+    "difficulty": "beginner",
+    "category": "Baiting",
+    "title": "De gevonden USB-stick",
+    "scenario": "Je loopt naar je auto op de parkeerplaats van je werk en ziet een USB-stick op de grond liggen. Er zit een label op: 'SALARISSEN 2026 - VERTROUWELIJK'. Je bent benieuwd en hebt je laptop bij je.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je steekt de USB-stick in je laptop om te kijken wat erop staat.",
+        "correct": false,
+        "explanation": "Dit is een klassieke baiting-aanval. USB-sticks kunnen automatisch malware uitvoeren zodra ze worden ingeplugd (BadUSB, HID-aanvallen). Het label is opzettelijk nieuwsgierigheid-prikkelend gemaakt."
+      },
+      {
+        "id": "b",
+        "text": "Je steekt hem in via een virtuele machine — zo ben je veilig.",
+        "correct": false,
+        "explanation": "VM-isolatie biedt geen volledige bescherming. HID-aanvallen (de USB doet zich voor als toetsenbord) werken ook in VM's. Neem de USB nooit mee naar binnen."
+      },
+      {
+        "id": "c",
+        "text": "Je geeft de USB-stick af bij de beveiliging of IT-afdeling zonder hem zelf te gebruiken.",
+        "correct": true,
+        "explanation": "Correct. IT kan de stick veilig analyseren in een geïsoleerde omgeving. Jij hoeft niets te riskeren. Gevonden USB-sticks zijn een bekende aanvalsvector."
+      },
+      {
+        "id": "d",
+        "text": "Je gooit hem weg — dan kan niemand hem gebruiken.",
+        "correct": false,
+        "explanation": "Beter dan inplugging, maar IT mist dan de kans om de aanval te analyseren en het bedrijf te waarschuwen. Lever altijd in bij IT/beveiliging."
+      }
+    ],
+    "tactic": "Baiting (USB Drop)",
+    "lesson": "USB drops zijn een bewezen aanvalstechniek. Aanvallers laten bewust USB-sticks achter met prikkelende labels. Regel: nooit een gevonden USB inplugging — altijd inleveren bij IT."
+  },
+  {
+    "id": 6,
+    "difficulty": "intermediate",
+    "category": "Smishing",
+    "title": "Het SMS-bericht van DigiD",
+    "scenario": "Je ontvangt een SMS: 'DigiD: Uw account is tijdelijk geblokkeerd wegens verdachte activiteit. Herstel uw account via: digid-herstel.nl/login — DigiD Klantenservice'. Je hebt DigiD nodig voor een aanvraag die je vandaag wil doen.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je klikt op de link — je moet DigiD vandaag nog hebben.",
+        "correct": false,
+        "explanation": "De tijdsdruk is opzettelijk. Het domein 'digid-herstel.nl' is niet het officiële DigiD-domein (digid.nl). Dit is een phishing-site die je inloggegevens steelt."
+      },
+      {
+        "id": "b",
+        "text": "Je googelt 'DigiD inloggen' en gebruikt de eerste zoekresultaat-link.",
+        "correct": false,
+        "explanation": "Zoekresultaten kunnen gesponsorde phishing-sites bevatten. Typ altijd het officiële adres direct in (digid.nl) of gebruik een opgeslagen bladwijzer."
+      },
+      {
+        "id": "c",
+        "text": "Je typt zelf digid.nl in de browser en controleert daar of je account geblokkeerd is.",
+        "correct": true,
+        "explanation": "Correct. Navigeer altijd rechtstreeks naar het officiële domein. Als er echt een probleem is, zie je dat na inloggen op de echte site. Overheidsinstanties sturen nooit inloglinks via SMS."
+      },
+      {
+        "id": "d",
+        "text": "Je belt het nummer uit het SMS-bericht om te vragen of het klopt.",
+        "correct": false,
+        "explanation": "SMS-berichten kunnen valse nummers bevatten. Bel alleen nummers die je zelf hebt opgezocht via de officiële overheidswebsite."
+      }
+    ],
+    "tactic": "Smishing + Urgency",
+    "lesson": "Overheidsinstanties sturen nooit inloglinks via SMS. Officieel DigiD-domein is altijd digid.nl. Urgentie in SMS is een waarschuwingssignaal, geen reden om sneller te klikken."
+  },
+  {
+    "id": 7,
+    "difficulty": "intermediate",
+    "category": "Quid Pro Quo",
+    "title": "De helpdesk die je belt",
+    "scenario": "Je werkt thuis. Je telefoon gaat: 'Goedemiddag, u spreekt met Mark van de IT-helpdesk. We zien dat uw laptop traag draait en willen dat graag voor u oplossen. Als u mij even remote access geeft via TeamViewer, kan ik het in 5 minuten fixen.' Je laptop is inderdaad wat traag de laatste tijd.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je geeft remote access — je laptop is echt traag en dit is handig.",
+        "correct": false,
+        "explanation": "Legitieme IT-helpdesks bellen nooit ongevraagd aan met aanbod van remote access. Met TeamViewer-toegang heeft de aanvaller volledige controle over je systeem."
+      },
+      {
+        "id": "b",
+        "text": "Je vraagt hem zijn naam en werknemersnummer, dan geef je toegang.",
+        "correct": false,
+        "explanation": "Aanvallers geven makkelijk valse namen en nummers. Dat verifieert niets. Remote access verlenen aan onbekenden is altijd een risico."
+      },
+      {
+        "id": "c",
+        "text": "Je beëindigt het gesprek en meldt de oproep via het officiële IT-ticket systeem.",
+        "correct": true,
+        "explanation": "Correct. Echte IT-helpdesks werken via ticketsystemen, niet via ongevraagde telefoontjes. Meld de poging zodat collega's gewaarschuwd worden."
+      },
+      {
+        "id": "d",
+        "text": "Je vraagt of hij je terugbelt op het IT-nummer dat je kent.",
+        "correct": false,
+        "explanation": "Beter dan direct toegang geven, maar de aanvaller kan beweren dat hij dat nummer is. Gebruik het officiële ticketsysteem als enige vertrouwd kanaal."
+      }
+    ],
+    "tactic": "Quid Pro Quo + Reverse Social Engineering",
+    "lesson": "Legitieme IT-diensten bellen nooit ongevraagd met aanbod van hulp. Dit heet 'reverse social engineering' — ze creëren behoefte (trage laptop) en bieden dan de 'oplossing'. Gebruik altijd officiële kanalen."
+  },
+  {
+    "id": 8,
+    "difficulty": "advanced",
+    "category": "BEC",
+    "title": "De dringende betaling",
+    "scenario": "Je werkt op de financiële afdeling. Je ontvangt een email van je directeur (j.bakker@jouwbedrijf.co — normaal .com): 'Hoi, ik zit in een vergadering met een nieuwe klant. We moeten snel €18.500 overmaken naar hun rekening voor de deal sluit. IBAN: NL29RABO0123456789. Verwerking moet vandaag nog — zorg dat het gebeurt. Stuur geen email terug, bel me even.' Je directeur is inderdaad in een externe vergadering vandaag.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je maakt het bedrag over — de directeur heeft het gevraagd en de vergadering klopt.",
+        "correct": false,
+        "explanation": "Het domein (.co vs .com) is een typosquat. De aanvaller heeft via LinkedIn of de bedrijfswebsite geweten dat de directeur vandaag een externe vergadering heeft. Dit is een klassieke BEC-aanval."
+      },
+      {
+        "id": "b",
+        "text": "Je belt de directeur op het nummer uit zijn emailhandtekening.",
+        "correct": false,
+        "explanation": "Emailhandtekeningen zijn onderdeel van de nep-email en kunnen valse nummers bevatten. Bel via een nummer dat je al eerder gebruikt hebt of dat in het bedrijfssysteem staat."
+      },
+      {
+        "id": "c",
+        "text": "Je belt de directeur op zijn bekende mobiele nummer (niet uit de email) om te verifiëren, en volgt het standaard vier-ogen-principe voor grote betalingen.",
+        "correct": true,
+        "explanation": "Correct. Verifieer altijd via een bekend, onafhankelijk kanaal. BEC-aanvallers rekenen erop dat medewerkers procedures omzeilen onder druk van een 'directeursopdracht'. Procedures bestaan juist voor dit soort situaties."
+      },
+      {
+        "id": "d",
+        "text": "Je stuurt een bevestigingsemail terug naar het afzenderadres.",
+        "correct": false,
+        "explanation": "De aanvaller beheert dat emailadres en bevestigt gewoon. Emailverificatie via hetzelfde kanaal garandeert niets."
+      }
+    ],
+    "tactic": "Business Email Compromise (BEC) + Typosquatting",
+    "lesson": "BEC-aanvallen kosten bedrijven wereldwijd miljarden per jaar. Controleer altijd het exacte domein van de afzender. Grote betalingen vereisen altijd verificatie via een onafhankelijk kanaal, ongeacht wie de opdracht geeft."
+  },
+  {
+    "id": 9,
+    "difficulty": "advanced",
+    "category": "OSINT + Spear Phishing",
+    "title": "De collega die je kent",
+    "scenario": "Je ontvangt een WhatsApp-bericht van het nummer van je collega Lisa: 'Hey! Ik zit vast zonder telefoon-betaal mogelijkheid. Kun jij even €150 naar mijn andere rekening sturen? Ik betaal je morgen terug. IBAN: NL91INGB0001234567. Stuur even een berichtje als gedaan!' Lisa heeft vorige week op Instagram gepost dat ze op vakantie is.",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je maakt het over — het is Lisa's nummer en ze is op vakantie, dat klopt.",
+        "correct": false,
+        "explanation": "WhatsApp-accounts worden regelmatig gehackt of gekloond. Dat het nummer klopt bewijst niets over wie er achter het scherm zit. De vakantie-info is publiek via Instagram."
+      },
+      {
+        "id": "b",
+        "text": "Je vraagt via WhatsApp of ze haar IBAN kan bevestigen.",
+        "correct": false,
+        "explanation": "Als het account gehackt is, antwoordt de aanvaller. Verificatie via hetzelfde gecompromitteerde kanaal biedt geen zekerheid."
+      },
+      {
+        "id": "c",
+        "text": "Je belt Lisa op haar nummer om te verifiëren voor je iets overmaakt.",
+        "correct": true,
+        "explanation": "Correct. Bellen verifieert stem en geeft real-time bevestiging. Als Lisa haar telefoon niet opneemt (vakantie), wacht dan of stuur een bericht via een ander kanaal (email, via familie)."
+      },
+      {
+        "id": "d",
+        "text": "Je maakt €50 over als test — als het haar is, weet ze dat je eraan komt.",
+        "correct": false,
+        "explanation": "Elk bedrag overmaken naar een onverifieerd account is verlies. Aanvallers accepteren ook kleine bedragen. Verifieer eerst, maak daarna pas over."
+      }
+    ],
+    "tactic": "OSINT + Account Takeover + Social Proof",
+    "lesson": "Aanvallers gebruiken publieke social media-info (vakantie, locatie) om geloofwaardigheid te creëren. WhatsApp-fraude via gehackte accounts is sterk gestegen. Regel: geld versturen alleen na telefonische verificatie."
   }
 ]
