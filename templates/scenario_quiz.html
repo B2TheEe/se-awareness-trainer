@@ -27,7 +27,15 @@
             </div>
         </div>
 
-        <h5 class="mb-3">Wat doe je?</h5>
+        <div class="d-flex gap-2 mb-3 align-items-center">
+            <h5 class="mb-0">Wat doe je?</h5>
+            <button id="hint-btn" class="btn btn-outline-warning btn-sm ms-auto" onclick="useHint()">
+                <i class="bi bi-lightbulb"></i> Hint <small>(-50%)</small>
+            </button>
+        </div>
+        <div id="hint-box" class="alert alert-warning py-2 d-none">
+            <i class="bi bi-lightbulb-fill"></i> <strong>Hint:</strong> {{ scenario.hint }}
+        </div>
         <div id="options">
             {% for option in scenario.options %}
             <button class="option-btn" onclick="submitAnswer('{{ option.id }}', this)" data-id="{{ option.id }}">
@@ -61,6 +69,15 @@ const TIME_LIMIT = {{ time_limit }};
 let timeRemaining = TIME_LIMIT;
 let timerInterval = null;
 let answered = false;
+let hintUsed = false;
+
+function useHint() {
+    if (hintUsed || answered) return;
+    hintUsed = true;
+    document.getElementById('hint-btn').disabled = true;
+    document.getElementById('hint-btn').innerHTML = '<i class="bi bi-lightbulb-fill"></i> Hint gebruikt';
+    document.getElementById('hint-box').classList.remove('d-none');
+}
 
 function startTimer() {
     const display = document.getElementById('timer-display');
@@ -91,7 +108,7 @@ function timeOut() {
     fetch('/scenarios/{{ scenario.id }}/submit', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({answer: null, timed_out: true})
+        body: JSON.stringify({answer: null, timed_out: true, hint_used: hintUsed})
     })
     .then(r => r.json())
     .then(data => showResult(data, null));
@@ -106,7 +123,7 @@ function submitAnswer(answerId, btn) {
     fetch('/scenarios/{{ scenario.id }}/submit', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({answer: answerId, timed_out: false})
+        body: JSON.stringify({answer: answerId, timed_out: false, hint_used: hintUsed})
     })
     .then(r => r.json())
     .then(data => showResult(data, btn));
@@ -117,8 +134,9 @@ function showResult(data, btn) {
 
     document.getElementById('result-icon').textContent =
         data.timed_out ? '⏰' : (data.correct ? '✅' : '❌');
-    document.getElementById('result-title').textContent =
-        data.timed_out ? 'Tijd verstreken!' : (data.correct ? 'Correct!' : 'Niet correct');
+    const hintNote = data.hint_used ? ' <span class="badge bg-warning text-dark">Hint gebruikt (max 50pts)</span>' : '';
+    document.getElementById('result-title').innerHTML =
+        (data.timed_out ? 'Tijd verstreken!' : (data.correct ? 'Correct!' : 'Niet correct')) + hintNote;
     document.getElementById('result-title').className =
         data.timed_out ? 'text-center text-warning' :
         (data.correct ? 'text-center text-success' : 'text-center text-danger');

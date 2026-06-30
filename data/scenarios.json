@@ -32,7 +32,8 @@
       }
     ],
     "tactic": "Pretexting + Authority",
-    "lesson": "Verifieer altijd identiteit via een onafhankelijk kanaal. Urgentie en autoriteit zijn klassieke SE-tactieken om je verificatiestap over te laten slaan."
+    "lesson": "Verifieer altijd identiteit via een onafhankelijk kanaal. Urgentie en autoriteit zijn klassieke SE-tactieken om je verificatiestap over te laten slaan.",
+    "hint": "Hoe zou jij kunnen bewijzen dat deze persoon echt van IT is, zonder zijn eigen woorden te vertrouwen?"
   },
   {
     "id": 2,
@@ -67,7 +68,8 @@
       }
     ],
     "tactic": "Spear Phishing + Baiting",
-    "lesson": "Verkorte URLs en externe domeinen zijn rode vlaggen. Verifieer recruiters altijd via het officiële bedrijfskanaal voor je persoonlijke info deelt."
+    "lesson": "Verkorte URLs en externe domeinen zijn rode vlaggen. Verifieer recruiters altijd via het officiële bedrijfskanaal voor je persoonlijke info deelt.",
+    "hint": "Kun je het bedrijf en de recruiter verifiëren zonder gebruik te maken van links uit dit bericht?"
   },
   {
     "id": 3,
@@ -102,7 +104,8 @@
       }
     ],
     "tactic": "Vishing + Caller ID Spoofing",
-    "lesson": "Telefoonnummers zijn te spoofen. Banken vragen nooit gevoelige info via inkomende gesprekken. Altijd ophangen en zelf terugbellen via officieel nummer."
+    "lesson": "Telefoonnummers zijn te spoofen. Banken vragen nooit gevoelige info via inkomende gesprekken. Altijd ophangen en zelf terugbellen via officieel nummer.",
+    "hint": "Onthoud: je kunt de identiteit van een inkomende beller niet verifiëren — alleen die van een uitgaand gesprek."
   },
   {
     "id": 4,
@@ -137,7 +140,8 @@
       }
     ],
     "tactic": "Tailgating + Sympathy",
-    "lesson": "Fysieke beveiliging is net zo belangrijk als digitale. Vol handen, uniform, vriendelijkheid — allemaal klassieke tailgating-tactieken. Elke persoon authenticeert zelf."
+    "lesson": "Fysieke beveiliging is net zo belangrijk als digitale. Vol handen, uniform, vriendelijkheid — allemaal klassieke tailgating-tactieken. Elke persoon authenticeert zelf.",
+    "hint": "Wie is er verantwoordelijk voor het regelen van fysieke toegang tot een beveiligd pand?"
   },
   {
     "id": 5,
@@ -172,7 +176,8 @@
       }
     ],
     "tactic": "Baiting (USB Drop)",
-    "lesson": "USB drops zijn een bewezen aanvalstechniek. Aanvallers laten bewust USB-sticks achter met prikkelende labels. Regel: nooit een gevonden USB inplugging — altijd inleveren bij IT."
+    "lesson": "USB drops zijn een bewezen aanvalstechniek. Aanvallers laten bewust USB-sticks achter met prikkelende labels. Regel: nooit een gevonden USB inplugging — altijd inleveren bij IT.",
+    "hint": "Wat kan er technisch gebeuren zodra je een onbekend USB-apparaat aansluit op je computer?"
   },
   {
     "id": 6,
@@ -207,7 +212,8 @@
       }
     ],
     "tactic": "Smishing + Urgency",
-    "lesson": "Overheidsinstanties sturen nooit inloglinks via SMS. Officieel DigiD-domein is altijd digid.nl. Urgentie in SMS is een waarschuwingssignaal, geen reden om sneller te klikken."
+    "lesson": "Overheidsinstanties sturen nooit inloglinks via SMS. Officieel DigiD-domein is altijd digid.nl. Urgentie in SMS is een waarschuwingssignaal, geen reden om sneller te klikken.",
+    "hint": "Hoe navigeer je veilig naar een overheidswebsite zonder een link in een bericht te gebruiken?"
   },
   {
     "id": 7,
@@ -242,7 +248,8 @@
       }
     ],
     "tactic": "Quid Pro Quo + Reverse Social Engineering",
-    "lesson": "Legitieme IT-diensten bellen nooit ongevraagd met aanbod van hulp. Dit heet 'reverse social engineering' — ze creëren behoefte (trage laptop) en bieden dan de 'oplossing'. Gebruik altijd officiële kanalen."
+    "lesson": "Legitieme IT-diensten bellen nooit ongevraagd met aanbod van hulp. Dit heet 'reverse social engineering' — ze creëren behoefte (trage laptop) en bieden dan de 'oplossing'. Gebruik altijd officiële kanalen.",
+    "hint": "Hoe nemen legitieme IT-helpdesks normaal gesproken contact op met medewerkers?"
   },
   {
     "id": 8,
@@ -277,7 +284,8 @@
       }
     ],
     "tactic": "Business Email Compromise (BEC) + Typosquatting",
-    "lesson": "BEC-aanvallen kosten bedrijven wereldwijd miljarden per jaar. Controleer altijd het exacte domein van de afzender. Grote betalingen vereisen altijd verificatie via een onafhankelijk kanaal, ongeacht wie de opdracht geeft."
+    "lesson": "BEC-aanvallen kosten bedrijven wereldwijd miljarden per jaar. Controleer altijd het exacte domein van de afzender. Grote betalingen vereisen altijd verificatie via een onafhankelijk kanaal, ongeacht wie de opdracht geeft.",
+    "hint": "Hoe verifieer je of een dringend betalingsverzoek van een leidinggevende écht van hem/haar komt?"
   },
   {
     "id": 9,
@@ -312,6 +320,7 @@
       }
     ],
     "tactic": "OSINT + Account Takeover + Social Proof",
-    "lesson": "Aanvallers gebruiken publieke social media-info (vakantie, locatie) om geloofwaardigheid te creëren. WhatsApp-fraude via gehackte accounts is sterk gestegen. Regel: geld versturen alleen na telefonische verificatie."
+    "lesson": "Aanvallers gebruiken publieke social media-info (vakantie, locatie) om geloofwaardigheid te creëren. WhatsApp-fraude via gehackte accounts is sterk gestegen. Regel: geld versturen alleen na telefonische verificatie.",
+    "hint": "Hoe kun je bewijzen dat het werkelijk jouw collega is die dit bericht stuurt?"
   }
 ]

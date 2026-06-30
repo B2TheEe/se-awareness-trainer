@@ -39,7 +39,8 @@
       }
     ],
     "explanation": "Classic phishing email using urgency, fear, and a spoofed sender. Real IT departments never ask for credentials via email links.",
-    "category": "IT Support Phishing"
+    "category": "IT Support Phishing",
+    "hint": "Controleer zorgvuldig van welk domein deze email afkomstig is — niet de naam, maar het adres."
   },
   {
     "id": 2,
@@ -76,7 +77,8 @@
       }
     ],
     "explanation": "Delivery phishing is extremely common in the Netherlands. Legitimate PostNL emails come from @postnl.nl and never request payment via external links.",
-    "category": "Delivery Phishing"
+    "category": "Delivery Phishing",
+    "hint": "Bekijk de URL in de betaallink nauwkeurig. Klopt het domein met de officiële website?"
   },
   {
     "id": 3,
@@ -118,7 +120,8 @@
       }
     ],
     "explanation": "Business Email Compromise (BEC) — most costly SE attack. Impersonates executives, uses urgency and secrecy to bypass normal financial controls. Always verify wire transfers via phone to a known number.",
-    "category": "BEC"
+    "category": "BEC",
+    "hint": "Vergelijk het emaildomein van de afzender teken voor teken met het echte bedrijfsdomein."
   },
   {
     "id": 4,
@@ -160,7 +163,8 @@
       }
     ],
     "explanation": "Abonnement-phishing is zeer effectief omdat slachtoffers bang zijn toegang te verliezen. Netflix stuurt betalingsupdates altijd via netflix.com en gebruikt nooit externe domeinen.",
-    "category": "Subscription Phishing"
+    "category": "Subscription Phishing",
+    "hint": "Legitieme bedrijven gebruiken uitsluitend hun eigen domein in links en afzenderadressen."
   },
   {
     "id": 5,
@@ -197,7 +201,8 @@
       }
     ],
     "explanation": "Belastingteruggave-phishing speelt in op hebzucht. De echte Belastingdienst communiceert via MijnOverheid (mijn.overheid.nl) en vraagt nooit bankgegevens te bevestigen via een emaillink.",
-    "category": "Government Phishing"
+    "category": "Government Phishing",
+    "hint": "De overheid communiceert via MijnOverheid (mijn.overheid.nl), niet via emaillinks naar externe sites."
   },
   {
     "id": 6,
@@ -234,7 +239,8 @@
       }
     ],
     "explanation": "Nep-SharePoint / OneDrive uitnodigingen zijn populair voor credential harvesting. De inlogpagina ziet er identiek uit aan Microsoft maar stuurt je wachtwoord naar de aanvaller. Verifieer altijd het domein en log in via portal.office.com, niet via emaillinks.",
-    "category": "Credential Harvesting"
+    "category": "Credential Harvesting",
+    "hint": "Van welk domein komen echte Microsoft SharePoint-uitnodigingen? Vergelijk met de link."
   },
   {
     "id": 7,
@@ -276,6 +282,7 @@
       }
     ],
     "explanation": "HR-phishing is bijzonder gevaarlijk omdat het om BSN, IBAN en salarisdata vraagt — genoeg voor identiteitsfraude. Echte HR-systemen zijn altijd intern toegankelijk. Verifieer altijd bij HR via telefoon of persoonlijk contact voor je zulke gegevens invult.",
-    "category": "HR Phishing"
+    "category": "HR Phishing",
+    "hint": "Welke combinatie van persoonsgegevens wordt hier gevraagd — en is dat normaal voor een HR-migratie?"
   }
 ]

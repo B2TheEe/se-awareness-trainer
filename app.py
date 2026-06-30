@@ -107,6 +107,7 @@ def phishing_submit(email_id):
     data = request.json
     selected = data.get('selected', [])
     time_remaining = max(0, int(data.get('time_remaining', 0)))
+    hint_used = bool(data.get('hint_used', False))
 
     all_flag_ids = {rf['id'] for rf in email['red_flags']}
     correct = set(selected) & all_flag_ids
@@ -116,23 +117,26 @@ def phishing_submit(email_id):
     penalty = len(wrong) * 10
     score = max(0, score - penalty)
     max_score = sum(rf['points'] for rf in email['red_flags'])
+    effective_max = max_score // 2 if hint_used else max_score
 
     time_bonus = min(30, time_remaining // 4) if score > 0 else 0
+    total_score = min(score + time_bonus, effective_max)
 
     with get_db() as conn:
         conn.execute(
             'INSERT INTO scores (quiz_type, item_id, difficulty, score, max_score, timestamp) VALUES (?,?,?,?,?,?)',
-            ('phishing', email_id, email['difficulty'], min(score + time_bonus, max_score),
-             max_score, datetime.utcnow().isoformat())
+            ('phishing', email_id, email['difficulty'], total_score,
+             effective_max, datetime.utcnow().isoformat())
         )
         conn.commit()
 
     result = {
         'score': score,
         'time_bonus': time_bonus,
-        'total_score': min(score + time_bonus, max_score),
-        'max_score': max_score,
-        'pct': round(min(score + time_bonus, max_score) / max_score * 100),
+        'total_score': total_score,
+        'max_score': effective_max,
+        'pct': round(total_score / effective_max * 100) if effective_max else 0,
+        'hint_used': hint_used,
         'correct_flags': [rf for rf in email['red_flags'] if rf['id'] in correct],
         'missed_flags': [rf for rf in email['red_flags'] if rf['id'] not in correct],
         'wrong_count': len(wrong),
@@ -173,7 +177,10 @@ def scenario_submit(scenario_id):
     data = request.json
     chosen = data.get('answer')
     timed_out = data.get('timed_out', False)
+    hint_used = bool(data.get('hint_used', False))
     option = next((o for o in scenario['options'] if o['id'] == chosen), None)
+
+    effective_max = 50 if hint_used else 100
 
     if timed_out:
         score = 0
@@ -184,7 +191,7 @@ def scenario_submit(scenario_id):
     else:
         if not option:
             return jsonify({'error': 'invalid answer'}), 400
-        score = 100 if option['correct'] else 0
+        score = effective_max if option['correct'] else 0
         correct = option['correct']
         explanation = option['explanation']
         lesson = scenario['lesson']
@@ -193,17 +200,20 @@ def scenario_submit(scenario_id):
     with get_db() as conn:
         conn.execute(
             'INSERT INTO scores (quiz_type, item_id, difficulty, score, max_score, timestamp) VALUES (?,?,?,?,?,?)',
-            ('scenario', scenario_id, scenario['difficulty'], score, 100, datetime.utcnow().isoformat())
+            ('scenario', scenario_id, scenario['difficulty'], score, effective_max,
+             datetime.utcnow().isoformat())
         )
         conn.commit()
 
     return jsonify({
         'correct': correct,
         'timed_out': timed_out,
+        'hint_used': hint_used,
         'explanation': explanation,
         'lesson': lesson,
         'tactic': tactic,
-        'score': score
+        'score': score,
+        'max_score': effective_max
     })
 
 

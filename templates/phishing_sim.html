@@ -95,7 +95,18 @@
                 Analyseer <span id="selected-count">(0 geselecteerd)</span>
             </button>
         </div>
-        <div class="card mt-3">
+        <div class="mt-2">
+            <button id="hint-btn" class="btn btn-outline-warning w-100" onclick="useHint()">
+                <i class="bi bi-lightbulb"></i> Hint gebruiken <small class="text-warning">(-50% max punten)</small>
+            </button>
+        </div>
+        <div id="hint-box" class="card mt-2 border-warning d-none">
+            <div class="card-body py-2">
+                <small class="text-warning"><i class="bi bi-lightbulb-fill"></i> <strong>Hint:</strong></small>
+                <p class="small mb-0 mt-1">{{ email.hint }}</p>
+            </div>
+        </div>
+        <div class="card mt-2">
             <div class="card-body">
                 <small class="text-muted">Klik op verdachte tekstelementen in de email. Je kunt meerdere elementen selecteren.</small>
             </div>
@@ -109,6 +120,7 @@ const TIME_LIMIT = {{ time_limit }};
 let timeRemaining = TIME_LIMIT;
 let timerInterval = null;
 let submitted = false;
+let hintUsed = false;
 
 const flagLabels = {
     {% for rf in email.red_flags %}
@@ -163,6 +175,14 @@ function updateSidebar() {
     ).join('');
 }
 
+function useHint() {
+    if (hintUsed || submitted) return;
+    hintUsed = true;
+    document.getElementById('hint-btn').disabled = true;
+    document.getElementById('hint-btn').innerHTML = '<i class="bi bi-lightbulb-fill"></i> Hint gebruikt <small>(-50%)</small>';
+    document.getElementById('hint-box').classList.remove('d-none');
+}
+
 function submitFlags(timedOut = false) {
     if (submitted) return;
     submitted = true;
@@ -172,7 +192,7 @@ function submitFlags(timedOut = false) {
     fetch('/phishing/{{ email.id }}/submit', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({selected: [...selected], time_remaining: timeRemaining})
+        body: JSON.stringify({selected: [...selected], time_remaining: timeRemaining, hint_used: hintUsed})
     })
     .then(r => r.json())
     .then(data => showResult(data, timedOut));
@@ -192,9 +212,12 @@ function showResult(data, timedOut) {
         pct >= 40 ? `Aardig! ${data.total_score}/${data.max_score} punten` :
         `Meer oefening nodig. ${data.total_score}/${data.max_score} punten`);
 
-    if (data.time_bonus > 0) {
+    if (data.time_bonus > 0 || data.hint_used) {
         const badge = document.getElementById('time-bonus-badge');
-        badge.innerHTML = `<span class="badge bg-success fs-6">+${data.time_bonus} tijdbonus</span>`;
+        let parts = [];
+        if (data.hint_used) parts.push(`<span class="badge bg-warning text-dark">Hint gebruikt (max ${data.max_score}pts)</span>`);
+        if (data.time_bonus > 0) parts.push(`<span class="badge bg-success">+${data.time_bonus} tijdbonus</span>`);
+        badge.innerHTML = parts.join(' ');
         badge.classList.remove('d-none');
     }
 
