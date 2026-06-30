@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Review Modus{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <h2 class="mb-0">Review Modus</h2>
+        <p class="text-muted mb-0">Bekijk eerder geoefende items met alle juiste antwoorden zichtbaar.</p>
+    </div>
+    <a href="/export/csv" class="btn btn-outline-success">
+        <i class="bi bi-download"></i> Export CSV
+    </a>
+</div>
+
+{% if not entries %}
+<div class="alert alert-secondary">
+    Nog geen pogingen. Start met <a href="/phishing">Phishing Sim</a>, <a href="/scenarios">Scenario's</a>, <a href="/login-detector">Login Detector</a> of <a href="/headers">Headers</a>.
+</div>
+{% else %}
+
+{% set type_labels = {'phishing': '🎣 Phishing', 'scenario': '🎭 Scenario', 'login': '🌐 Login', 'headers': '📋 Headers'} %}
+{% set type_order = ['phishing', 'scenario', 'login', 'headers'] %}
+
+{% for qt in type_order %}
+{% set group = entries | selectattr('quiz_type', 'eq', qt) | list %}
+{% if group %}
+<h5 class="mt-4 mb-2">{{ type_labels[qt] }}</h5>
+<div class="row g-2">
+{% for e in group %}
+<div class="col-md-6 col-lg-4">
+    <div class="card">
+        <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold small">{{ e.title[:50] }}{% if e.title|length > 50 %}…{% endif %}</div>
+                    <div class="text-muted" style="font-size:.75rem">
+                        <span class="badge badge-{{ e.difficulty }}">{{ e.difficulty }}</span>
+                        {{ e.attempts }} poging(en) · {{ e.last_played }}
+                    </div>
+                </div>
+                <div class="ms-2 fw-bold" style="font-size:1.1rem;
+                    color: {% if e.best_pct >= 70 %}#28a745{% elif e.best_pct >= 40 %}#fd7e14{% else %}#dc3545{% endif %}">
+                    {{ e.best_pct }}%
+                </div>
+            </div>
+        </div>
+        <div class="card-footer p-1">
+            <a href="/review/{{ e.quiz_type }}/{{ e.item_id }}" class="btn btn-outline-secondary btn-sm w-100">
+                <i class="bi bi-eye"></i> Bekijk antwoorden
+            </a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endblock %}

@@ -347,6 +347,106 @@ def headers_submit(header_id):
     })
 
 
+@app.route('/export/csv')
+def export_csv():
+    import csv
+    import io
+    emails    = {e['id']: e for e in load_json('phishing_emails.json')}
+    scenarios = {s['id']: s for s in load_json('scenarios.json')}
+    logins    = {l['id']: l for l in load_json('fake_logins.json')}
+    hdr_items = {h['id']: h for h in load_json('email_headers.json')}
+    type_map  = {'phishing': emails, 'scenario': scenarios, 'login': logins, 'headers': hdr_items}
+
+    with get_db() as conn:
+        rows = conn.execute('SELECT * FROM scores ORDER BY timestamp DESC').fetchall()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['timestamp', 'quiz_type', 'item_id', 'category', 'difficulty',
+                     'score', 'max_score', 'pct'])
+    for r in rows:
+        item = type_map.get(r['quiz_type'], {}).get(r['item_id'])
+        cat  = item['category'] if item else 'Onbekend'
+        pct  = round(r['score'] / r['max_score'] * 100) if r['max_score'] else 0
+        writer.writerow([r['timestamp'], r['quiz_type'], r['item_id'], cat,
+                         r['difficulty'], r['score'], r['max_score'], pct])
+
+    from flask import Response
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=se_trainer_scores.csv'}
+    )
+
+
+def _all_items():
+    emails    = {('phishing',  e['id']): e for e in load_json('phishing_emails.json')}
+    scenarios = {('scenario',  s['id']): s for s in load_json('scenarios.json')}
+    logins    = {('login',     l['id']): l for l in load_json('fake_logins.json')}
+    hdr_items = {('headers',   h['id']): h for h in load_json('email_headers.json')}
+    return {**emails, **scenarios, **logins, **hdr_items}
+
+
+@app.route('/review')
+def review_list():
+    items = _all_items()
+    with get_db() as conn:
+        rows = conn.execute('''
+            SELECT quiz_type, item_id,
+                   COUNT(*) as attempts,
+                   MAX(CAST(score AS FLOAT)/max_score*100) as best_pct,
+                   MAX(timestamp) as last_played
+            FROM scores
+            GROUP BY quiz_type, item_id
+            ORDER BY last_played DESC
+        ''').fetchall()
+
+    entries = []
+    for r in rows:
+        item = items.get((r['quiz_type'], r['item_id']))
+        if not item:
+            continue
+        title = item.get('subject') or item.get('title') or item.get('category', '?')
+        entries.append({
+            'quiz_type': r['quiz_type'],
+            'item_id': r['item_id'],
+            'title': title,
+            'category': item.get('category', ''),
+            'difficulty': item.get('difficulty', ''),
+            'attempts': r['attempts'],
+            'best_pct': round(r['best_pct'], 1),
+            'last_played': r['last_played'][:16].replace('T', ' ')
+        })
+
+    return render_template('review_list.html', entries=entries)
+
+
+@app.route('/review/<quiz_type>/<int:item_id>')
+def review_detail(quiz_type, item_id):
+    items = _all_items()
+    item = items.get((quiz_type, item_id))
+    if not item:
+        return 'Niet gevonden', 404
+
+    with get_db() as conn:
+        history = conn.execute('''
+            SELECT score, max_score, timestamp
+            FROM scores
+            WHERE quiz_type=? AND item_id=?
+            ORDER BY timestamp DESC
+            LIMIT 10
+        ''', (quiz_type, item_id)).fetchall()
+
+    attempts = [{
+        'score': r['score'], 'max_score': r['max_score'],
+        'pct': round(r['score'] / r['max_score'] * 100) if r['max_score'] else 0,
+        'timestamp': r['timestamp'][:16].replace('T', ' ')
+    } for r in history]
+
+    return render_template('review_detail.html', item=item, quiz_type=quiz_type,
+                           attempts=attempts)
+
+
 @app.route('/library')
 def library():
     tactics = [

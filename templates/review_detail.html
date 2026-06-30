@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Review — {{ item.get('subject') or item.get('title') or item.get('category') }}{% endblock %}
+
+{% block content %}
+<style>
+.rf-correct  { background: rgba(40,167,69,0.2);  border: 2px solid #28a745; border-radius:3px; padding:1px 4px; }
+.rf-header { background:#0d1117; border:1px solid #2d3154; border-radius:6px; font-family:monospace; font-size:.82rem; line-height:1.7; padding:16px; overflow-x:auto; }
+.hl-line { display:block; white-space:pre; }
+.hl-line.match { background:rgba(40,167,69,0.15); border-left:3px solid #28a745; padding-left:4px; }
+.browser-chrome-rv { background:#2d2d2d; border-radius:8px 8px 0 0; padding:8px 12px 0; }
+.browser-toolbar-rv { background:#3c3c3c; border-radius:4px; padding:5px 10px; display:flex; align-items:center; gap:8px; }
+.browser-url-rv { flex:1; background:#1e1e1e; border-radius:4px; padding:3px 10px; font-size:.83rem; font-family:monospace; }
+.browser-content-rv { background:#fff; border-radius:0 0 8px 8px; min-height:200px; padding:24px; color:#333; }
+.fake-logo-rv { font-size:1.5rem; font-weight:300; margin-bottom:16px; }
+.fake-input-rv { display:block; width:100%; max-width:300px; padding:8px 10px; border:1px solid #dadce0; border-radius:4px; margin-bottom:10px; font-size:.9rem; background:#f8f9fa; color:#999; }
+</style>
+
+<div class="d-flex align-items-center gap-3 mb-3">
+    <a href="/review" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> Terug</a>
+    <h2 class="mb-0">Review</h2>
+    <span class="badge badge-{{ item.difficulty }}">{{ item.difficulty }}</span>
+    <span class="badge bg-secondary">{{ item.category }}</span>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+
+    {# ── PHISHING ── #}
+    {% if quiz_type == 'phishing' %}
+    <div class="card mb-3">
+        <div class="card-header">Email</div>
+        <div class="p-0">
+            <div style="background:#f5f5f5; border-bottom:1px solid #ddd; padding:12px 16px; font-family:Arial,sans-serif; color:#333;">
+                <div><strong>Van:</strong> <span class="rf-correct">{{ item.sender_name }} &lt;{{ item.sender_email }}&gt;</span></div>
+                <div><strong>Onderwerp:</strong> {{ item.subject }}</div>
+            </div>
+            <div style="background:#fff; color:#333; padding:16px; font-family:Arial,sans-serif; white-space:pre-wrap; line-height:1.8;">
+                {% for line in item.body.split('\n') %}
+                    {% if 'http' in line or 'bit.ly' in line or '.tk' in line or '.online' in line or '.net' in line
+                          or '24 uur' in line or '48 uur' in line or '14 dagen' in line
+                          or 'verwijderd' in line or 'deleted' in line or 'suspended' in line
+                          or 'BSN' in line or 'IBAN' in line or 'bankgegevens' in line %}
+                        <span class="rf-correct">{{ line }}</span>
+                    {% else %}
+                        {{ line }}
+                    {% endif %}
+                    {% if not loop.last %}&#10;{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header text-success"><i class="bi bi-check-circle"></i> Alle rode vlaggen</div>
+        <ul class="list-group list-group-flush">
+        {% for rf in item.red_flags %}
+            <li class="list-group-item" style="background:#1a1d2e; color:#e0e0e0;">
+                <span class="text-success">✓</span> {{ rf.text }} <span class="badge bg-success">+{{ rf.points }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    {# ── SCENARIO ── #}
+    {% elif quiz_type == 'scenario' %}
+    <div class="card mb-3">
+        <div class="card-header"><i class="bi bi-camera-reels"></i> {{ item.title }}</div>
+        <div class="card-body"><p class="lead mb-0">{{ item.scenario }}</p></div>
+    </div>
+    <h5 class="mb-2">Antwoorden</h5>
+    {% for option in item.options %}
+    <div class="p-3 mb-2 rounded" style="
+        background: {% if option.correct %}rgba(40,167,69,0.15){% else %}rgba(220,53,69,0.08){% endif %};
+        border: 2px solid {% if option.correct %}#28a745{% else %}#444{% endif %};">
+        <strong>{{ option.id|upper }}.</strong> {{ option.text }}
+        {% if option.correct %}<span class="badge bg-success ms-2">Correct</span>{% endif %}
+        <div class="text-muted small mt-1">{{ option.explanation }}</div>
+    </div>
+    {% endfor %}
+    <div class="alert alert-info mt-3">
+        <strong>Tactiek:</strong> {{ item.tactic }}<br>
+        <strong>Les:</strong> {{ item.lesson }}
+    </div>
+
+    {# ── LOGIN DETECTOR ── #}
+    {% elif quiz_type == 'login' %}
+    <div class="browser-chrome-rv shadow mb-3">
+        <div class="browser-toolbar-rv">
+            <span>{% if item.ssl_status == 'none' %}🔓{% else %}🔒{% endif %}</span>
+            <div class="browser-url-rv rf-correct">{{ item.browser_url }}</div>
+        </div>
+        <div class="browser-content-rv">
+            <div class="fake-logo-rv">{{ item.logo_text }}</div>
+            <p style="font-size:.9rem; margin-bottom:12px;">Sign in</p>
+            {% for field in item.form_fields %}
+            <input class="fake-input-rv" type="text" placeholder="{{ field }}" disabled>
+            {% endfor %}
+            <div style="margin-top:12px; font-size:.75rem; color:#777;">{{ item.footer_text }}</div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="card-header text-success"><i class="bi bi-check-circle"></i> Alle rode vlaggen</div>
+        <ul class="list-group list-group-flush">
+        {% for rf in item.red_flags %}
+            <li class="list-group-item" style="background:#1a1d2e; color:#e0e0e0;">
+                <span class="text-success">✓</span> {{ rf.text }} <span class="badge bg-success">+{{ rf.points }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    {# ── EMAIL HEADERS ── #}
+    {% elif quiz_type == 'headers' %}
+    {% set flag_line_hints = {} %}
+    {% for rf in item.red_flags %}{% set _ = flag_line_hints.update({rf.line_hint: rf}) %}{% endfor %}
+    <div class="rf-header mb-3">
+        {% for line in item.headers.split('\n') %}
+            {% set matched = namespace(rf=None) %}
+            {% for rf in item.red_flags %}
+                {% if rf.line_hint in line %}{% set matched.rf = rf %}{% endif %}
+            {% endfor %}
+            {% if matched.rf %}
+            <span class="hl-line match" title="{{ matched.rf.text }}">{{ line }}</span>
+            {% else %}
+            <span class="hl-line">{{ line }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="card mb-3">
+        <div class="card-header text-success"><i class="bi bi-check-circle"></i> Alle rode vlaggen</div>
+        <ul class="list-group list-group-flush">
+        {% for rf in item.red_flags %}
+            <li class="list-group-item" style="background:#1a1d2e; color:#e0e0e0;">
+                <span class="text-success">✓</span> <code class="text-warning">{{ rf.line_hint }}</code> — {{ rf.text }}
+                <span class="badge bg-success">+{{ rf.points }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body">
+            <strong>Uitleg:</strong> {{ item.explanation }}
+        </div>
+    </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header">Jouw pogingen</div>
+            <div class="card-body p-0">
+                <table class="table table-dark table-sm mb-0">
+                    <thead><tr><th>Score</th><th>%</th><th>Tijd</th></tr></thead>
+                    <tbody>
+                    {% for a in attempts %}
+                    <tr>
+                        <td>{{ a.score }}/{{ a.max_score }}</td>
+                        <td style="color: {% if a.pct >= 70 %}#28a745{% elif a.pct >= 40 %}#fd7e14{% else %}#dc3545{% endif %}">{{ a.pct }}%</td>
+                        <td class="text-muted small">{{ a.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <a href="/review" class="btn btn-outline-secondary w-100 mb-2">Terug naar overzicht</a>
+        {% if quiz_type == 'phishing' %}
+        <a href="/phishing/{{ item.id }}" class="btn btn-outline-danger w-100">Opnieuw proberen</a>
+        {% elif quiz_type == 'scenario' %}
+        <a href="/scenarios/{{ item.id }}" class="btn btn-outline-warning w-100">Opnieuw proberen</a>
+        {% elif quiz_type == 'login' %}
+        <a href="/login-detector/{{ item.id }}" class="btn btn-outline-primary w-100">Opnieuw proberen</a>
+        {% elif quiz_type == 'headers' %}
+        <a href="/headers/{{ item.id }}" class="btn btn-outline-success w-100">Opnieuw proberen</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
