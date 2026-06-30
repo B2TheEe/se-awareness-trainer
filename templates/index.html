@@ -1,47 +1,78 @@
 {% extends 'base.html' %}
 {% block title %}SE Awareness Trainer — Home{% endblock %}
 {% block content %}
-<div class="row mb-4">
+<div class="row mb-4 align-items-center">
     <div class="col">
         <h1 class="fw-bold"><span style="color:#ff4444">Social Engineering</span> Awareness Trainer</h1>
-        <p class="text-muted">Leer aanvallen herkennen en de juiste reactie kiezen. Offline, lokaal, geen data naar buiten.</p>
+        <p class="text-muted mb-0">Leer aanvallen herkennen en de juiste reactie kiezen. Offline, lokaal, geen data naar buiten.</p>
+    </div>
+    <div class="col-auto">
+        <div class="card text-center px-4 py-2" style="border-color:#fd7e14;">
+            <div style="font-size:2rem; font-weight:700; color:#fd7e14;">{{ streak }}</div>
+            <div class="text-muted small">dag streak 🔥</div>
+        </div>
     </div>
 </div>
 
-<div class="row g-4 mb-4">
-    <div class="col-md-4">
+{# Daily challenge banner #}
+<div class="card mb-4 border-warning">
+    <div class="card-body d-flex align-items-center gap-3 py-2">
+        <span style="font-size:1.8rem">⚡</span>
+        <div>
+            <div class="fw-bold">Daily Challenge</div>
+            <div class="text-muted small">{{ daily.icon }} {{ daily.title }} — <span class="badge badge-{{ daily.difficulty }}">{{ daily.difficulty }}</span></div>
+        </div>
+        <div class="ms-auto d-flex gap-2 align-items-center">
+            {% if daily.completed %}
+            <span class="badge bg-success"><i class="bi bi-check"></i> Voltooid</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">+25 pts</span>
+            {% endif %}
+            <a href="/daily" class="btn btn-warning btn-sm">
+                {% if daily.completed %}Bekijk{% else %}Start{% endif %}
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
         <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <div style="font-size:3rem">🎣</div>
-                <h4 class="mt-2">Phishing Simulator</h4>
-                <p class="text-muted">Analyseer nepemails en identificeer rode vlaggen. Punten per gevonden indicator.</p>
-                {% if stats.get('phishing') %}
-                <div class="badge bg-secondary mb-2">{{ stats.phishing.attempts }} pogingen — gem. {{ stats.phishing.avg_pct }}%</div>
-                {% endif %}
-                <a href="/phishing" class="btn btn-outline-danger d-block mt-2">Start Phishing Sim</a>
+            <div class="card-body text-center p-3">
+                <div style="font-size:2.2rem">🎣</div>
+                <h6 class="mt-1">Phishing Sim</h6>
+                {% if stats.get('phishing') %}<div class="badge bg-secondary mb-1">gem. {{ stats.phishing.avg_pct }}%</div>{% endif %}
+                <a href="/phishing" class="btn btn-outline-danger btn-sm d-block mt-1">Start</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <div style="font-size:3rem">🎭</div>
-                <h4 class="mt-2">Scenario Quiz</h4>
-                <p class="text-muted">Realistische SE-situaties. Kies de juiste reactie en leer waarom andere opties falen.</p>
-                {% if stats.get('scenario') %}
-                <div class="badge bg-secondary mb-2">{{ stats.scenario.attempts }} pogingen — gem. {{ stats.scenario.avg_pct }}%</div>
-                {% endif %}
-                <a href="/scenarios" class="btn btn-outline-warning d-block mt-2">Start Scenario's</a>
+            <div class="card-body text-center p-3">
+                <div style="font-size:2.2rem">🎭</div>
+                <h6 class="mt-1">Scenario Quiz</h6>
+                {% if stats.get('scenario') %}<div class="badge bg-secondary mb-1">gem. {{ stats.scenario.avg_pct }}%</div>{% endif %}
+                <a href="/scenarios" class="btn btn-outline-warning btn-sm d-block mt-1">Start</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <div style="font-size:3rem">📚</div>
-                <h4 class="mt-2">Tactiek Bibliotheek</h4>
-                <p class="text-muted">Diepgang over 7 SE-tactieken: signalen, voorbeelden, verdediging.</p>
-                <a href="/library" class="btn btn-outline-info d-block mt-2">Open Bibliotheek</a>
+            <div class="card-body text-center p-3">
+                <div style="font-size:2.2rem">🌐</div>
+                <h6 class="mt-1">Login Detector</h6>
+                {% if stats.get('login') %}<div class="badge bg-secondary mb-1">gem. {{ stats.login.avg_pct }}%</div>{% endif %}
+                <a href="/login-detector" class="btn btn-outline-primary btn-sm d-block mt-1">Start</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center p-3">
+                <div style="font-size:2.2rem">📋</div>
+                <h6 class="mt-1">Header Analyse</h6>
+                {% if stats.get('headers') %}<div class="badge bg-secondary mb-1">gem. {{ stats.headers.avg_pct }}%</div>{% endif %}
+                <a href="/headers" class="btn btn-outline-success btn-sm d-block mt-1">Start</a>
             </div>
         </div>
     </div>

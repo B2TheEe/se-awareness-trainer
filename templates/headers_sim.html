@@ -176,6 +176,7 @@ function showResult(data, timedOut) {
     const badges = [];
     if (data.hint_used) badges.push(`<span class="badge bg-warning text-dark">Hint gebruikt</span>`);
     if (data.time_bonus > 0) badges.push(`<span class="badge bg-success">+${data.time_bonus} tijdbonus</span>`);
+    if (data.daily_bonus > 0) badges.push(`<span class="badge bg-warning text-dark">⚡ +${data.daily_bonus} daily bonus</span>`);
     document.getElementById('bonus-badges').innerHTML = badges.join(' ');
     document.getElementById('result-explanation').textContent = data.explanation;
     document.getElementById('correct-flags').innerHTML = data.correct_flags.length === 0 ? '<small class="text-muted">Geen</small>' : data.correct_flags.map(f => `<small class="d-block">✓ ${f.text} (+${f.points})</small>`).join('');

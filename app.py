@@ -1,6 +1,7 @@
 import json
 import os
-from datetime import datetime
+import random
+from datetime import datetime, date, timedelta
 from flask import Flask, render_template, request, jsonify, session
 import sqlite3
 
@@ -30,12 +31,110 @@ def init_db():
                 timestamp TEXT NOT NULL
             )
         ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS daily_challenges (
+                date TEXT PRIMARY KEY,
+                quiz_type TEXT NOT NULL,
+                item_id INTEGER NOT NULL,
+                bonus_awarded INTEGER DEFAULT 0
+            )
+        ''')
         conn.commit()
 
 
-DIFFICULTY_TIME = {'beginner': 120, 'intermediate': 90, 'advanced': 60}
-UNLOCK_THRESHOLD = 2
-UNLOCK_MIN_PCT = 50
+DIFFICULTY_TIME   = {'beginner': 120, 'intermediate': 90, 'advanced': 60}
+UNLOCK_THRESHOLD  = 2
+UNLOCK_MIN_PCT    = 50
+DAILY_BONUS       = 25
+
+MODULE_ICONS = {
+    'phishing': '🎣', 'scenario': '🎭', 'login': '🌐', 'headers': '📋'
+}
+MODULE_URLS = {
+    'phishing': '/phishing', 'scenario': '/scenarios',
+    'login': '/login-detector', 'headers': '/headers'
+}
+
+
+def get_streak():
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT DISTINCT DATE(timestamp) as d FROM scores ORDER BY d DESC"
+        ).fetchall()
+    if not rows:
+        return 0
+    today = datetime.utcnow().date()
+    streak = 0
+    check = today
+    for row in rows:
+        d = date.fromisoformat(row['d'])
+        if d == check:
+            streak += 1
+            check -= timedelta(days=1)
+        elif d < check:
+            break
+    return streak
+
+
+def _daily_pick(today_str):
+    all_items = []
+    for e in load_json('phishing_emails.json'):
+        all_items.append({'quiz_type': 'phishing', 'item_id': e['id'], 'item': e})
+    for s in load_json('scenarios.json'):
+        all_items.append({'quiz_type': 'scenario', 'item_id': s['id'], 'item': s})
+    for l in load_json('fake_logins.json'):
+        all_items.append({'quiz_type': 'login', 'item_id': l['id'], 'item': l})
+    for h in load_json('email_headers.json'):
+        all_items.append({'quiz_type': 'headers', 'item_id': h['id'], 'item': h})
+    return random.Random(today_str).choice(all_items)
+
+
+def get_daily_challenge():
+    today = datetime.utcnow().strftime('%Y-%m-%d')
+    pick = _daily_pick(today)
+    with get_db() as conn:
+        row = conn.execute(
+            "SELECT bonus_awarded FROM daily_challenges WHERE date=?", (today,)
+        ).fetchone()
+    completed = row is not None and row['bonus_awarded']
+    item = pick['item']
+    title = item.get('subject') or item.get('title') or item.get('category', '?')
+    return {
+        'date': today,
+        'quiz_type': pick['quiz_type'],
+        'item_id': pick['item_id'],
+        'title': title,
+        'category': item.get('category', ''),
+        'difficulty': item.get('difficulty', ''),
+        'completed': completed,
+        'icon': MODULE_ICONS.get(pick['quiz_type'], '?'),
+        'url': f"{MODULE_URLS[pick['quiz_type']]}/{pick['item_id']}"
+    }
+
+
+def check_and_award_daily(quiz_type, item_id):
+    today = datetime.utcnow().strftime('%Y-%m-%d')
+    pick = _daily_pick(today)
+    if pick['quiz_type'] != quiz_type or pick['item_id'] != item_id:
+        return 0
+    with get_db() as conn:
+        existing = conn.execute(
+            "SELECT bonus_awarded FROM daily_challenges WHERE date=?", (today,)
+        ).fetchone()
+        if existing is None:
+            conn.execute(
+                "INSERT INTO daily_challenges (date, quiz_type, item_id, bonus_awarded) VALUES (?,?,?,1)",
+                (today, quiz_type, item_id)
+            )
+            conn.commit()
+            return DAILY_BONUS
+        if not existing['bonus_awarded']:
+            conn.execute(
+                "UPDATE daily_challenges SET bonus_awarded=1 WHERE date=?", (today,)
+            )
+            conn.commit()
+            return DAILY_BONUS
+    return 0
 
 
 def load_json(filename):
@@ -72,7 +171,15 @@ def index():
             GROUP BY quiz_type
         ''').fetchall()
     stats = {r['quiz_type']: dict(r) for r in rows}
-    return render_template('index.html', stats=stats)
+    return render_template('index.html', stats=stats,
+                           streak=get_streak(),
+                           daily=get_daily_challenge())
+
+
+@app.route('/daily')
+def daily():
+    challenge = get_daily_challenge()
+    return render_template('daily.html', challenge=challenge)
 
 
 @app.route('/phishing')
@@ -119,8 +226,9 @@ def phishing_submit(email_id):
     max_score = sum(rf['points'] for rf in email['red_flags'])
     effective_max = max_score // 2 if hint_used else max_score
 
-    time_bonus = min(30, time_remaining // 4) if score > 0 else 0
-    total_score = min(score + time_bonus, effective_max)
+    time_bonus  = min(30, time_remaining // 4) if score > 0 else 0
+    daily_bonus = check_and_award_daily('phishing', email_id)
+    total_score = min(score + time_bonus + daily_bonus, effective_max + daily_bonus)
 
     with get_db() as conn:
         conn.execute(
@@ -131,16 +239,12 @@ def phishing_submit(email_id):
         conn.commit()
 
     result = {
-        'score': score,
-        'time_bonus': time_bonus,
-        'total_score': total_score,
-        'max_score': effective_max,
-        'pct': round(total_score / effective_max * 100) if effective_max else 0,
-        'hint_used': hint_used,
+        'score': score, 'time_bonus': time_bonus, 'daily_bonus': daily_bonus,
+        'total_score': total_score, 'max_score': effective_max, 'hint_used': hint_used,
+        'pct': round(min(total_score, effective_max) / effective_max * 100) if effective_max else 0,
         'correct_flags': [rf for rf in email['red_flags'] if rf['id'] in correct],
         'missed_flags': [rf for rf in email['red_flags'] if rf['id'] not in correct],
-        'wrong_count': len(wrong),
-        'explanation': email['explanation']
+        'wrong_count': len(wrong), 'explanation': email['explanation']
     }
     return jsonify(result)
 
@@ -197,23 +301,22 @@ def scenario_submit(scenario_id):
         lesson = scenario['lesson']
         tactic = scenario['tactic']
 
+    daily_bonus = check_and_award_daily('scenario', scenario_id) if not timed_out else 0
+    total_score = score + daily_bonus
+
     with get_db() as conn:
         conn.execute(
             'INSERT INTO scores (quiz_type, item_id, difficulty, score, max_score, timestamp) VALUES (?,?,?,?,?,?)',
-            ('scenario', scenario_id, scenario['difficulty'], score, effective_max,
+            ('scenario', scenario_id, scenario['difficulty'], total_score, effective_max,
              datetime.utcnow().isoformat())
         )
         conn.commit()
 
     return jsonify({
-        'correct': correct,
-        'timed_out': timed_out,
-        'hint_used': hint_used,
-        'explanation': explanation,
-        'lesson': lesson,
-        'tactic': tactic,
-        'score': score,
-        'max_score': effective_max
+        'correct': correct, 'timed_out': timed_out, 'hint_used': hint_used,
+        'explanation': explanation, 'lesson': lesson, 'tactic': tactic,
+        'score': score, 'daily_bonus': daily_bonus,
+        'total_score': total_score, 'max_score': effective_max
     })
 
 
@@ -260,8 +363,9 @@ def login_detector_submit(login_id):
     score = max(0, score - penalty)
     max_score = sum(rf['points'] for rf in login['red_flags'])
     effective_max = max_score // 2 if hint_used else max_score
-    time_bonus = min(20, time_remaining // 6) if score > 0 else 0
-    total_score = min(score + time_bonus, effective_max)
+    time_bonus  = min(20, time_remaining // 6) if score > 0 else 0
+    daily_bonus = check_and_award_daily('login', login_id)
+    total_score = min(score + time_bonus + daily_bonus, effective_max + daily_bonus)
 
     with get_db() as conn:
         conn.execute(
@@ -272,13 +376,12 @@ def login_detector_submit(login_id):
         conn.commit()
 
     return jsonify({
-        'score': score, 'time_bonus': time_bonus, 'total_score': total_score,
-        'max_score': effective_max, 'hint_used': hint_used,
-        'pct': round(total_score / effective_max * 100) if effective_max else 0,
+        'score': score, 'time_bonus': time_bonus, 'daily_bonus': daily_bonus,
+        'total_score': total_score, 'max_score': effective_max, 'hint_used': hint_used,
+        'pct': round(min(total_score, effective_max) / effective_max * 100) if effective_max else 0,
         'correct_flags': [rf for rf in login['red_flags'] if rf['id'] in correct],
         'missed_flags': [rf for rf in login['red_flags'] if rf['id'] not in correct],
-        'wrong_count': len(wrong),
-        'explanation': login['explanation']
+        'wrong_count': len(wrong), 'explanation': login['explanation']
     })
 
 
@@ -325,8 +428,9 @@ def headers_submit(header_id):
     score = max(0, score - penalty)
     max_score = sum(rf['points'] for rf in header['red_flags'])
     effective_max = max_score // 2 if hint_used else max_score
-    time_bonus = min(20, time_remaining // 6) if score > 0 else 0
-    total_score = min(score + time_bonus, effective_max)
+    time_bonus  = min(20, time_remaining // 6) if score > 0 else 0
+    daily_bonus = check_and_award_daily('headers', header_id)
+    total_score = min(score + time_bonus + daily_bonus, effective_max + daily_bonus)
 
     with get_db() as conn:
         conn.execute(
@@ -337,13 +441,12 @@ def headers_submit(header_id):
         conn.commit()
 
     return jsonify({
-        'score': score, 'time_bonus': time_bonus, 'total_score': total_score,
-        'max_score': effective_max, 'hint_used': hint_used,
-        'pct': round(total_score / effective_max * 100) if effective_max else 0,
+        'score': score, 'time_bonus': time_bonus, 'daily_bonus': daily_bonus,
+        'total_score': total_score, 'max_score': effective_max, 'hint_used': hint_used,
+        'pct': round(min(total_score, effective_max) / effective_max * 100) if effective_max else 0,
         'correct_flags': [rf for rf in header['red_flags'] if rf['id'] in correct],
         'missed_flags': [rf for rf in header['red_flags'] if rf['id'] not in correct],
-        'wrong_count': len(wrong),
-        'explanation': header['explanation']
+        'wrong_count': len(wrong), 'explanation': header['explanation']
     })
 
 

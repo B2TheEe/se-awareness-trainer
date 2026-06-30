@@ -134,7 +134,10 @@ function showResult(data, btn) {
 
     document.getElementById('result-icon').textContent =
         data.timed_out ? '⏰' : (data.correct ? '✅' : '❌');
-    const hintNote = data.hint_used ? ' <span class="badge bg-warning text-dark">Hint gebruikt (max 50pts)</span>' : '';
+    const badges = [];
+    if (data.hint_used) badges.push('<span class="badge bg-warning text-dark">Hint gebruikt</span>');
+    if (data.daily_bonus > 0) badges.push(`<span class="badge bg-warning text-dark">⚡ +${data.daily_bonus} daily bonus</span>`);
+    const hintNote = badges.length ? ' ' + badges.join(' ') : '';
     document.getElementById('result-title').innerHTML =
         (data.timed_out ? 'Tijd verstreken!' : (data.correct ? 'Correct!' : 'Niet correct')) + hintNote;
     document.getElementById('result-title').className =

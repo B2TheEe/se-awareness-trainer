@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Daily Challenge{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-warning shadow">
+            <div class="card-header d-flex align-items-center gap-2 border-warning" style="background:#1a1d2e;">
+                <span style="font-size:1.5rem">⚡</span>
+                <strong>Daily Challenge</strong>
+                <span class="ms-auto text-muted small">{{ challenge.date }}</span>
+            </div>
+            <div class="card-body text-center py-5">
+                <div style="font-size:4rem">{{ challenge.icon }}</div>
+                <h3 class="mt-2">{{ challenge.title }}</h3>
+                <div class="d-flex justify-content-center gap-2 mb-3 mt-2">
+                    <span class="badge badge-{{ challenge.difficulty }}">{{ challenge.difficulty }}</span>
+                    <span class="badge bg-secondary">{{ challenge.category }}</span>
+                    <span class="badge bg-warning text-dark">+25 bonus punten</span>
+                </div>
+                <p class="text-muted">Voltooi vandaag dit item om 25 bonuspunten te verdienen bovenop je reguliere score.</p>
+                {% if challenge.completed %}
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle-fill"></i> <strong>Voltooid!</strong> Je hebt vandaag de daily challenge gehaald.
+                </div>
+                <a href="{{ challenge.url }}" class="btn btn-outline-secondary">Nogmaals oefenen (zonder bonus)</a>
+                {% else %}
+                <a href="{{ challenge.url }}" class="btn btn-warning btn-lg px-5">
+                    <i class="bi bi-lightning-fill"></i> Start Challenge
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-center mt-3 text-muted small">
+            Elke dag een nieuw item. De keuze is gebaseerd op de datum.
+        </div>
+    </div>
+</div>
+{% endblock %}

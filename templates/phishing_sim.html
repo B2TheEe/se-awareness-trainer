@@ -212,11 +212,12 @@ function showResult(data, timedOut) {
         pct >= 40 ? `Aardig! ${data.total_score}/${data.max_score} punten` :
         `Meer oefening nodig. ${data.total_score}/${data.max_score} punten`);
 
-    if (data.time_bonus > 0 || data.hint_used) {
+    const parts = [];
+    if (data.hint_used) parts.push(`<span class="badge bg-warning text-dark">Hint gebruikt</span>`);
+    if (data.time_bonus > 0) parts.push(`<span class="badge bg-success">+${data.time_bonus} tijdbonus</span>`);
+    if (data.daily_bonus > 0) parts.push(`<span class="badge bg-warning text-dark">⚡ +${data.daily_bonus} daily bonus</span>`);
+    if (parts.length) {
         const badge = document.getElementById('time-bonus-badge');
-        let parts = [];
-        if (data.hint_used) parts.push(`<span class="badge bg-warning text-dark">Hint gebruikt (max ${data.max_score}pts)</span>`);
-        if (data.time_bonus > 0) parts.push(`<span class="badge bg-success">+${data.time_bonus} tijdbonus</span>`);
         badge.innerHTML = parts.join(' ');
         badge.classList.remove('d-none');
     }
