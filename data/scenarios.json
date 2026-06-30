@@ -322,5 +322,221 @@
     "tactic": "OSINT + Account Takeover + Social Proof",
     "lesson": "Aanvallers gebruiken publieke social media-info (vakantie, locatie) om geloofwaardigheid te creëren. WhatsApp-fraude via gehackte accounts is sterk gestegen. Regel: geld versturen alleen na telefonische verificatie.",
     "hint": "Hoe kun je bewijzen dat het werkelijk jouw collega is die dit bericht stuurt?"
+  },
+  {
+    "id": 10,
+    "difficulty": "beginner",
+    "category": "Shoulder Surfing",
+    "title": "De meekijker in de trein",
+    "scenario": "Je zit in de trein en werkt aan een gevoelig rapport op je laptop. Je voert je wachtwoord in voor het bedrijfsportaal. De persoon naast je zit dicht bij je en lijkt op zijn telefoon te kijken, maar je merkt dat hij schuin naar je scherm kijkt. Je hebt nog een uur te reizen en veel werk te doen.",
+    "hint": "Wat kun je doen om te voorkomen dat iemand gevoelige info ziet zonder je werk te stoppen?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je werkt gewoon door — de kans dat hij iets ziet is klein.",
+        "correct": false,
+        "explanation": "Shoulder surfing is bewust en effectief. Wachtwoorden, klantnamen en vertrouwelijke data zijn in seconden afgelezen. 'Kleine kans' is geen beveiliging."
+      },
+      {
+        "id": "b",
+        "text": "Je plaatst je laptop zo dat alleen jij het scherm ziet, of gebruikt een privacyscherm.",
+        "correct": true,
+        "explanation": "Correct. Schermhoek aanpassen of een privacyfilter gebruiken is de standaard aanpak voor werken in openbare ruimtes met gevoelige data."
+      },
+      {
+        "id": "c",
+        "text": "Je spreekt de persoon aan en vraagt hem te stoppen met kijken.",
+        "correct": false,
+        "explanation": "Confrontatie is onnodig en kan escaleren. Bovendien lost het het structurele probleem niet op — een volgende meekijker wordt niet gewaarschuwd."
+      },
+      {
+        "id": "d",
+        "text": "Je stopt met werken en wacht tot je thuis bent.",
+        "correct": false,
+        "explanation": "Beter dan doorgaan met risico, maar niet nodig. Met de juiste schermhoek of privacyfilter kun je veilig in het openbaar werken."
+      }
+    ],
+    "tactic": "Shoulder Surfing",
+    "lesson": "Openbare ruimtes zijn risicovolle werkomgevingen. Standaardmaatregelen: scherm afschermen, privacyfilter gebruiken, nooit wachtwoorden intypen als anderen meekijken, vergrendel bij weggaan."
+  },
+  {
+    "id": 11,
+    "difficulty": "beginner",
+    "category": "Tech Support Scam",
+    "title": "Microsoft belt je",
+    "scenario": "Je telefoon gaat. Een man zegt: 'Goedemiddag, u spreekt met David van Microsoft Security. Onze systemen detecteren dat uw Windows-computer ernstige virussen heeft die persoonlijke data sturen naar hackers. Ik moet u helpen dit nu te verwijderen. Kunt u uw computer aanzetten en naar deze website gaan: support-fix.microsoft-help.com?'",
+    "hint": "Zou Microsoft weten dat jouw specifieke pc een virus heeft — en je spontaan bellen om dat te melden?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je zet je computer aan en gaat naar de website — Microsoft weet dit soort dingen.",
+        "correct": false,
+        "explanation": "Microsoft monitort geen individuele pc's en belt nooit spontaan over virussen. De website installeert malware of geeft remote access aan de aanvaller."
+      },
+      {
+        "id": "b",
+        "text": "Je vraagt hem te wachten terwijl je jouw antivirussoftware opstart om te controleren.",
+        "correct": false,
+        "explanation": "Wachten op de lijn houdt de aanvaller betrokken. Hij kan druk opvoeren. Hang op — er valt niets te verifiëren via dit kanaal."
+      },
+      {
+        "id": "c",
+        "text": "Je hangt direct op — Microsoft belt nooit spontaan over pc-problemen.",
+        "correct": true,
+        "explanation": "Correct. Tech support scams zijn een van de meest voorkomende oplichterijen. Microsoft, Apple en antivirusbedrijven bellen nooit uit zichzelf. Hang op en meld bij het Fraudemeldpunt."
+      },
+      {
+        "id": "d",
+        "text": "Je vraagt zijn naam en werknemersnummer en belt Microsoft terug.",
+        "correct": false,
+        "explanation": "Microsoft heeft geen support-lijn die dit behandelt. Terugbellen bevestigt ook dat je nummer actief is. Gewoon ophangen."
+      }
+    ],
+    "tactic": "Vishing + Tech Support Scam",
+    "lesson": "Tech support scams doen zich voor als Microsoft, Apple, of antivirusbedrijven. Ze bellen nooit spontaan. Doel: remote access of betaling voor 'reparatie'. Regel: ophangen, niets klikken, niets betalen."
+  },
+  {
+    "id": 12,
+    "difficulty": "intermediate",
+    "category": "AI Voice Cloning",
+    "title": "De stem van je manager",
+    "scenario": "Je werkt thuis. Je telefoon gaat — het is het mobiele nummer van je manager Lisa. Ze klinkt precies zoals altijd: 'Hé, ik zit in een spoedvergadering en kan niet op mijn laptop. Kun jij snel de VPN-inloggegevens van het serviceaccount naar mijn privémail sturen? lisa.private@gmail.com. Het is dringend.' De stem klinkt 100% als Lisa.",
+    "hint": "Hoe kun je bewijzen dat het echt Lisa is, ook al klinkt de stem identiek?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je stuurt de gegevens — de stem en het nummer kloppen beide.",
+        "correct": false,
+        "explanation": "AI voice cloning bootst iemands stem perfect na met slechts seconden audiomateriaal. Telefoonnummers zijn te spoofen. Twee vervalste signalen bewijzen niets."
+      },
+      {
+        "id": "b",
+        "text": "Je vraagt haar een geheime veiligheidscode die jullie hebben afgesproken.",
+        "correct": true,
+        "explanation": "Correct. Een vooraf afgesproken codewoord is niet te raden door een AI-aanvaller. Geen codewoord? Hang op en verifieer via Teams, Slack of zakelijk email."
+      },
+      {
+        "id": "c",
+        "text": "Je stuurt de gegevens naar het zakelijke emailadres van Lisa in plaats van Gmail.",
+        "correct": false,
+        "explanation": "Beter dan Gmail, maar je deelt nog steeds inloggegevens op basis van een niet-geverifieerd verzoek. Inloggegevens horen niet via email gedeeld te worden."
+      },
+      {
+        "id": "d",
+        "text": "Je belt Lisa terug op hetzelfde nummer.",
+        "correct": false,
+        "explanation": "Als het nummer gespoofed is, bel je de aanvaller terug. Gebruik een alternatief kanaal (Teams, Slack) dat de aanvaller niet controleert."
+      }
+    ],
+    "tactic": "AI Voice Cloning + Caller ID Spoofing",
+    "lesson": "AI voice cloning is goedkoop en toegankelijk. Een stem alleen verificeert niets meer. Standaard: codewoord-systeem met collega's voor gevoelige verzoeken, of verifieer via een tweede onafhankelijk kanaal."
+  },
+  {
+    "id": 13,
+    "difficulty": "intermediate",
+    "category": "Invoice Fraud",
+    "title": "De gewijzigde leveranciersrekening",
+    "scenario": "Je werkt op de financiële afdeling. Je ontvangt een email van jullie vaste leverancier Acme B.V. (van hun bekende emailadres): 'Beste relatie, wij hebben ons bankrekeningnummer gewijzigd per 1 juli. Alle toekomstige betalingen graag naar: NL29RABO9876543210. Bijgevoegd de nieuwe factuur.' Het emailadres ziet er volledig legitiem uit.",
+    "hint": "Hoe verifieer je een IBAN-wijziging van een leverancier voordat je dit doorvoert?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je verwerkt de wijziging — het email komt van hun bekende adres.",
+        "correct": false,
+        "explanation": "Leveranciers-emailaccounts worden regelmatig gehackt (BEC via compromised account). Een correct afzenderadres bewijst niet dat het verzoek legitiem is."
+      },
+      {
+        "id": "b",
+        "text": "Je belt de leverancier op een nummer dat jij al had (niet uit de email) om te bevestigen.",
+        "correct": true,
+        "explanation": "Correct. Verifieer IBAN-wijzigingen altijd telefonisch via een eerder bekend nummer — nooit via het nummer uit de email. Dit is standaardprocedure voor rekeningwijzigingen."
+      },
+      {
+        "id": "c",
+        "text": "Je stuurt een bevestigingsemail naar het afzenderadres.",
+        "correct": false,
+        "explanation": "Als het account gehackt is, antwoordt de aanvaller. Emailverificatie via hetzelfde kanaal biedt geen zekerheid."
+      },
+      {
+        "id": "d",
+        "text": "Je verwerkt een eerste kleine testbetaling om te controleren.",
+        "correct": false,
+        "explanation": "Elke betaling naar een onverifieerd account is potentieel verlies. Bedrag maakt geen verschil — verifieer eerst, betaal daarna."
+      }
+    ],
+    "tactic": "Invoice Fraud + BEC via Compromised Account",
+    "lesson": "Factuur- en IBAN-fraude kost bedrijven jaarlijks miljoenen. Beleid: elke IBAN-wijziging vereist telefonische bevestiging via een eerder bekend nummer. Nooit IBAN doorvoeren op basis van email alleen."
+  },
+  {
+    "id": 14,
+    "difficulty": "advanced",
+    "category": "Insider Threat",
+    "title": "De nieuwe collega",
+    "scenario": "Een nieuwe collega, Ravi, werkt drie weken bij jullie team. Hij is vriendelijk en levert goed werk. Hij vraagt je: 'Ik moet een rapport maken voor de directie maar heb geen toegang tot de klantendatabase. Kun jij me even inloggen met jouw account? Ik heb al een ticket ingediend maar IT duurt altijd zo lang.' Hij toont een openstaand ticket op zijn scherm.",
+    "hint": "Wat is het risico van inloggen met jouw account, ook als je de persoon vertrouwt?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je logt in voor hem — hij is een collega en je hebt het ticket gezien.",
+        "correct": false,
+        "explanation": "Inloggen met jouw account maakt jou verantwoordelijk voor alles wat hij doet. Tickets zijn makkelijk te fabriceren. Vertrouwen ≠ autorisatie."
+      },
+      {
+        "id": "b",
+        "text": "Je logt in maar blijft erbij zitten om te zien wat hij doet.",
+        "correct": false,
+        "explanation": "Jij blijft aansprakelijk voor alles onder jouw credentials. Insider threats kopiëren data snel, ook terwijl je meekijkt."
+      },
+      {
+        "id": "c",
+        "text": "Je weigert vriendelijk en helpt hem het IT-ticket te versnellen via de juiste kanalen.",
+        "correct": true,
+        "explanation": "Correct. Accountdeling is altijd verboden, ook tussen collega's. Help door het escalatieproces te versnellen — niet door je credentials te delen."
+      },
+      {
+        "id": "d",
+        "text": "Je vraagt toestemming aan je manager voor je inlogt.",
+        "correct": false,
+        "explanation": "Manager-toestemming maakt accountdeling niet veilig of toegestaan. Het beleid geldt altijd. Escaleer het ticket, deel geen credentials."
+      }
+    ],
+    "tactic": "Insider Threat + Social Engineering",
+    "lesson": "Insider threats zijn moeilijker te detecteren dan externe aanvallen. Accountdeling is altijd verboden — ook met vertrouwde collega's. Elke medewerker heeft eigen credentials of wacht op juiste toegang via IT."
+  },
+  {
+    "id": 15,
+    "difficulty": "advanced",
+    "category": "Watering Hole",
+    "title": "De aanbevolen tool",
+    "scenario": "Tijdens een teammeeting zegt een collega: 'Iedereen in mijn vorige bedrijf gebruikte FastDocs Pro voor documenten delen — het is gratis en veel beter dan SharePoint. Ik heb het al op mijn laptop. Installeer het maar, de downloadlink staat in de Teams-chat.' Twee andere collega's knikken instemmend. De link gaat naar fastdocs-pro-download.com.",
+    "hint": "Wat moet je controleren voordat je software installeert op basis van een collega-aanbeveling?",
+    "options": [
+      {
+        "id": "a",
+        "text": "Je installeert het — drie collega's vertrouwen het en je hebt het zelf nodig.",
+        "correct": false,
+        "explanation": "Social proof ('iedereen gebruikt het') is een klassieke SE-techniek. Collega's hebben het mogelijk al gecompromitteerd geïnstalleerd. fastdocs-pro-download.com is geen officieel domein."
+      },
+      {
+        "id": "b",
+        "text": "Je googelt de tool en installeert via het eerste zoekresultaat.",
+        "correct": false,
+        "explanation": "Gesponsorde zoekresultaten kunnen nep-downloadpagina's zijn. Gebruik altijd de officiële website van de fabrikant."
+      },
+      {
+        "id": "c",
+        "text": "Je vraagt IT-goedkeuring en verifieert de software via het officiële domein van de fabrikant.",
+        "correct": true,
+        "explanation": "Correct. Bedrijfssoftware vereist IT-goedkeuring. Het officiële domein van de fabrikant is de enige betrouwbare bron. Watering hole-aanvallen verspreiden malware via nep-versies van legitieme tools."
+      },
+      {
+        "id": "d",
+        "text": "Je installeert het in een VM zodat je systeem veilig blijft.",
+        "correct": false,
+        "explanation": "VM-isolatie beschermt gedeeltelijk maar niet volledig. Bovendien gebruik je bedrijfsmiddelen voor niet-goedgekeurde software. IT-goedkeuring is altijd vereist."
+      }
+    ],
+    "tactic": "Watering Hole + Social Proof",
+    "lesson": "Social proof verlaagt de drempel voor risicogedrag. Watering hole-aanvallen verspreiden malware via nep-versies van legitieme tools. Regel: geen software zonder IT-goedkeuring, altijd downloaden van het officiële domein van de fabrikant."
   }
 ]
