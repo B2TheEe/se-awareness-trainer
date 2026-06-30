@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Zwakke Punten Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-1">Dashboard</h2>
+<p class="text-muted mb-4">Prestaties per aanvalscategorie — zie waar je het meest van kunt leren.</p>
+
+{% if not category_avgs %}
+<div class="alert alert-secondary">
+    Nog geen data. Start met <a href="/phishing">Phishing Sim</a> of <a href="/scenarios">Scenario's</a>.
+</div>
+{% else %}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="text-muted small">Totaal pogingen</div>
+                <div style="font-size:2rem; font-weight:700;">{{ total_attempts }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="text-muted small">Gemiddeld score</div>
+                <div style="font-size:2rem; font-weight:700;
+                    color: {% if overall_avg >= 70 %}#28a745{% elif overall_avg >= 40 %}#fd7e14{% else %}#dc3545{% endif %}">
+                    {{ overall_avg }}%
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="text-muted small">Categorieën getraind</div>
+                <div style="font-size:2rem; font-weight:700;">{{ category_avgs|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="text-muted small">Moeilijkheid avg</div>
+                <div class="small mt-1">
+                    {% for d, avg in diff_avgs.items() %}
+                    {% if avg is not none %}
+                    <span class="badge badge-{{ d }} me-1">{{ d[:3] }} {{ avg }}%</span>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header text-danger"><i class="bi bi-exclamation-triangle"></i> Zwakste categorieën</div>
+            <div class="card-body p-0">
+                {% for cat, data in weakest %}
+                <div class="d-flex align-items-center p-3 border-bottom">
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">{{ cat }}</div>
+                        <div class="text-muted small">{{ data.attempts }} poging(en) · {{ data.quiz_type }}</div>
+                        <div class="progress mt-1" style="height:6px;">
+                            <div class="progress-bar bg-danger" style="width:{{ data.avg }}%"></div>
+                        </div>
+                    </div>
+                    <div class="ms-3 fw-bold text-danger" style="font-size:1.3rem; min-width:3.5ch;">{{ data.avg }}%</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-success">
+            <div class="card-header text-success"><i class="bi bi-trophy"></i> Sterkste categorieën</div>
+            <div class="card-body p-0">
+                {% for cat, data in strongest %}
+                <div class="d-flex align-items-center p-3 border-bottom">
+                    <div class="flex-grow-1">
+                        <div class="fw-bold">{{ cat }}</div>
+                        <div class="text-muted small">{{ data.attempts }} poging(en) · {{ data.quiz_type }}</div>
+                        <div class="progress mt-1" style="height:6px;">
+                            <div class="progress-bar bg-success" style="width:{{ data.avg }}%"></div>
+                        </div>
+                    </div>
+                    <div class="ms-3 fw-bold text-success" style="font-size:1.3rem; min-width:3.5ch;">{{ data.avg }}%</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">Alle categorieën</div>
+    <div class="card-body">
+        <canvas id="categoryChart" height="80"></canvas>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Recente 10 pogingen</div>
+    <div class="card-body p-0">
+        <table class="table table-dark table-hover mb-0 small">
+            <thead>
+                <tr><th>Categorie</th><th>Type</th><th>Niveau</th><th>Score</th><th>Tijd</th></tr>
+            </thead>
+            <tbody>
+            {% for r in recent_scores %}
+            <tr>
+                <td>{{ r.category }}</td>
+                <td>{{ r.quiz_type }}</td>
+                <td><span class="badge badge-{{ r.difficulty }}">{{ r.difficulty[:3] }}</span></td>
+                <td style="color: {% if r.pct >= 70 %}#28a745{% elif r.pct >= 40 %}#fd7e14{% else %}#dc3545{% endif %}">{{ r.pct }}%</td>
+                <td class="text-muted">{{ r.timestamp }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if category_avgs %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const labels = {{ category_avgs.keys()|list|tojson }};
+const avgs   = {{ category_avgs.values()|map(attribute='avg')|list|tojson }};
+const colors = avgs.map(v => v >= 70 ? '#28a745' : v >= 40 ? '#fd7e14' : '#dc3545');
+
+new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [{
+            label: 'Gemiddeld %',
+            data: avgs,
+            backgroundColor: colors,
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: {
+                min: 0, max: 100,
+                ticks: { color: '#aaa', callback: v => v + '%' },
+                grid: { color: '#2d3154' }
+            },
+            y: { ticks: { color: '#e0e0e0' }, grid: { color: '#2d3154' } }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

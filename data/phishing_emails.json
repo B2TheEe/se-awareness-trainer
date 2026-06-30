@@ -7,14 +7,39 @@
     "sender_email": "it-support@company-helpdesk.net",
     "body": "Dear Employee,\n\nWe have detected unusual activity on your account. Your access will be suspended in 24 hours unless you verify your credentials immediately.\n\nClick here to verify: http://company-login.verify-now.tk/login\n\nIf you do not verify, your account will be permanently deleted.\n\nIT Support Team\nCompany Helpdesk",
     "red_flags": [
-      {"id": "rf1", "text": "Suspicious sender domain (company-helpdesk.net, not your company domain)", "points": 20},
-      {"id": "rf2", "text": "Urgency tactic: '24 hours' deadline", "points": 15},
-      {"id": "rf3", "text": "Suspicious URL: verify-now.tk (not company domain)", "points": 25},
-      {"id": "rf4", "text": "Threat of account deletion to create panic", "points": 15},
-      {"id": "rf5", "text": "Generic greeting 'Dear Employee'", "points": 10},
-      {"id": "rf6", "text": "Requests credentials via link", "points": 15}
+      {
+        "id": "rf1",
+        "text": "Suspicious sender domain (company-helpdesk.net, not your company domain)",
+        "points": 20
+      },
+      {
+        "id": "rf2",
+        "text": "Urgency tactic: '24 hours' deadline",
+        "points": 15
+      },
+      {
+        "id": "rf3",
+        "text": "Suspicious URL: verify-now.tk (not company domain)",
+        "points": 25
+      },
+      {
+        "id": "rf4",
+        "text": "Threat of account deletion to create panic",
+        "points": 15
+      },
+      {
+        "id": "rf5",
+        "text": "Generic greeting 'Dear Employee'",
+        "points": 10
+      },
+      {
+        "id": "rf6",
+        "text": "Requests credentials via link",
+        "points": 15
+      }
     ],
-    "explanation": "Classic phishing email using urgency, fear, and a spoofed sender. Real IT departments never ask for credentials via email links."
+    "explanation": "Classic phishing email using urgency, fear, and a spoofed sender. Real IT departments never ask for credentials via email links.",
+    "category": "IT Support Phishing"
   },
   {
     "id": 2,
@@ -24,13 +49,34 @@
     "sender_email": "no-reply@postnl-tracking-update.com",
     "body": "Dear customer,\n\nWe attempted to deliver your package (tracking: NL987654321) but were unable to complete delivery.\n\nTo reschedule delivery, a small fee of €2.95 is required.\n\nPay now: https://postnl-delivery.payment-secure.online/pay?id=NL987654321\n\nPayment must be completed within 48 hours or the package will be returned.\n\nPostNL Customer Service",
     "red_flags": [
-      {"id": "rf1", "text": "Sender domain not official PostNL (postnl-tracking-update.com)", "points": 25},
-      {"id": "rf2", "text": "Payment URL not official PostNL domain (payment-secure.online)", "points": 25},
-      {"id": "rf3", "text": "Small fee request — classic smishing/phishing tactic", "points": 20},
-      {"id": "rf4", "text": "48-hour deadline creates false urgency", "points": 15},
-      {"id": "rf5", "text": "Generic 'Dear customer' — no name", "points": 15}
+      {
+        "id": "rf1",
+        "text": "Sender domain not official PostNL (postnl-tracking-update.com)",
+        "points": 25
+      },
+      {
+        "id": "rf2",
+        "text": "Payment URL not official PostNL domain (payment-secure.online)",
+        "points": 25
+      },
+      {
+        "id": "rf3",
+        "text": "Small fee request — classic smishing/phishing tactic",
+        "points": 20
+      },
+      {
+        "id": "rf4",
+        "text": "48-hour deadline creates false urgency",
+        "points": 15
+      },
+      {
+        "id": "rf5",
+        "text": "Generic 'Dear customer' — no name",
+        "points": 15
+      }
     ],
-    "explanation": "Delivery phishing is extremely common in the Netherlands. Legitimate PostNL emails come from @postnl.nl and never request payment via external links."
+    "explanation": "Delivery phishing is extremely common in the Netherlands. Legitimate PostNL emails come from @postnl.nl and never request payment via external links.",
+    "category": "Delivery Phishing"
   },
   {
     "id": 3,
@@ -40,14 +86,39 @@
     "sender_email": "j.devries@your-company.co",
     "body": "Hi,\n\nAs discussed in yesterday's meeting, I need you to process an urgent wire transfer of €45,000 to our new supplier before end of day.\n\nBank: IBAN NL91ABNA0417164300\nReference: Q4-SUPPLIER-2026\n\nThis is time-sensitive and needs to happen before the board meeting tomorrow. Please confirm once done. Keep this between us for now as the deal is not yet public.\n\nThanks,\nJan\n\nSent from iPhone",
     "red_flags": [
-      {"id": "rf1", "text": "Domain is your-company.co not your-company.com (typosquat)", "points": 25},
-      {"id": "rf2", "text": "'Keep this between us' — isolation tactic", "points": 20},
-      {"id": "rf3", "text": "Extreme urgency: 'before end of day', 'before board meeting'", "points": 15},
-      {"id": "rf4", "text": "Wire transfer request via email — bypasses normal approval", "points": 25},
-      {"id": "rf5", "text": "CEO/CFO fraud (BEC) — impersonates executive", "points": 20},
-      {"id": "rf6", "text": "'As discussed' references fake meeting to build false familiarity", "points": 15}
+      {
+        "id": "rf1",
+        "text": "Domain is your-company.co not your-company.com (typosquat)",
+        "points": 25
+      },
+      {
+        "id": "rf2",
+        "text": "'Keep this between us' — isolation tactic",
+        "points": 20
+      },
+      {
+        "id": "rf3",
+        "text": "Extreme urgency: 'before end of day', 'before board meeting'",
+        "points": 15
+      },
+      {
+        "id": "rf4",
+        "text": "Wire transfer request via email — bypasses normal approval",
+        "points": 25
+      },
+      {
+        "id": "rf5",
+        "text": "CEO/CFO fraud (BEC) — impersonates executive",
+        "points": 20
+      },
+      {
+        "id": "rf6",
+        "text": "'As discussed' references fake meeting to build false familiarity",
+        "points": 15
+      }
     ],
-    "explanation": "Business Email Compromise (BEC) — most costly SE attack. Impersonates executives, uses urgency and secrecy to bypass normal financial controls. Always verify wire transfers via phone to a known number."
+    "explanation": "Business Email Compromise (BEC) — most costly SE attack. Impersonates executives, uses urgency and secrecy to bypass normal financial controls. Always verify wire transfers via phone to a known number.",
+    "category": "BEC"
   },
   {
     "id": 4,
@@ -57,14 +128,39 @@
     "sender_email": "no-reply@netflix-account-update.com",
     "body": "Beste klant,\n\nUw Netflix abonnement is verlopen omdat uw betaalmethode is geweigerd.\n\nOm uw abonnement te hervatten, werk uw betalingsgegevens bij:\nhttp://netflix-betaling.account-herstel.online/update\n\nAls u niet reageert binnen 48 uur, wordt uw account en alle profielen permanent verwijderd.\n\nMet vriendelijke groet,\nNetflix Klantenservice",
     "red_flags": [
-      {"id": "rf1", "text": "Afzenderdomein is niet netflix.com (netflix-account-update.com)", "points": 25},
-      {"id": "rf2", "text": "Urgentie: '48 uur' deadline voor actie", "points": 15},
-      {"id": "rf3", "text": "URL is geen netflix.com-domein (account-herstel.online)", "points": 25},
-      {"id": "rf4", "text": "Dreiging: account + alle profielen 'permanent verwijderd'", "points": 15},
-      {"id": "rf5", "text": "Generieke aanhef 'Beste klant' — Netflix gebruikt je naam", "points": 10},
-      {"id": "rf6", "text": "Vraagt betalingsgegevens via externe link", "points": 10}
+      {
+        "id": "rf1",
+        "text": "Afzenderdomein is niet netflix.com (netflix-account-update.com)",
+        "points": 25
+      },
+      {
+        "id": "rf2",
+        "text": "Urgentie: '48 uur' deadline voor actie",
+        "points": 15
+      },
+      {
+        "id": "rf3",
+        "text": "URL is geen netflix.com-domein (account-herstel.online)",
+        "points": 25
+      },
+      {
+        "id": "rf4",
+        "text": "Dreiging: account + alle profielen 'permanent verwijderd'",
+        "points": 15
+      },
+      {
+        "id": "rf5",
+        "text": "Generieke aanhef 'Beste klant' — Netflix gebruikt je naam",
+        "points": 10
+      },
+      {
+        "id": "rf6",
+        "text": "Vraagt betalingsgegevens via externe link",
+        "points": 10
+      }
     ],
-    "explanation": "Abonnement-phishing is zeer effectief omdat slachtoffers bang zijn toegang te verliezen. Netflix stuurt betalingsupdates altijd via netflix.com en gebruikt nooit externe domeinen."
+    "explanation": "Abonnement-phishing is zeer effectief omdat slachtoffers bang zijn toegang te verliezen. Netflix stuurt betalingsupdates altijd via netflix.com en gebruikt nooit externe domeinen.",
+    "category": "Subscription Phishing"
   },
   {
     "id": 5,
@@ -74,13 +170,34 @@
     "sender_email": "teruggave@belastingdienst-terugbetaling.nl",
     "body": "Geachte belastingplichtige,\n\nNa controle van uw aangifte heeft u recht op een belastingteruggave van €347,00.\n\nOm uw teruggave te ontvangen dient u uw bankgegevens te bevestigen via onderstaande link:\nhttps://belastingdienst-terugbetaling.nl/teruggave/bevestig\n\nVerwerking vindt plaats binnen 3-5 werkdagen na bevestiging.\n\nDeze aanvraag vervalt na 14 dagen.\n\nMet vriendelijke groet,\nBelastingdienst Nederland",
     "red_flags": [
-      {"id": "rf1", "text": "Afzenderdomein is niet belastingdienst.nl (belastingdienst-terugbetaling.nl)", "points": 30},
-      {"id": "rf2", "text": "Vervaldatum van 14 dagen creëert kunstmatige urgentie", "points": 15},
-      {"id": "rf3", "text": "URL-domein is belastingdienst-terugbetaling.nl — niet belastingdienst.nl", "points": 25},
-      {"id": "rf4", "text": "Vraagt bankgegevens te 'bevestigen' via link — overheid doet dit nooit", "points": 20},
-      {"id": "rf5", "text": "Belastingdienst communiceert via MijnOverheid, niet via email-links", "points": 10}
+      {
+        "id": "rf1",
+        "text": "Afzenderdomein is niet belastingdienst.nl (belastingdienst-terugbetaling.nl)",
+        "points": 30
+      },
+      {
+        "id": "rf2",
+        "text": "Vervaldatum van 14 dagen creëert kunstmatige urgentie",
+        "points": 15
+      },
+      {
+        "id": "rf3",
+        "text": "URL-domein is belastingdienst-terugbetaling.nl — niet belastingdienst.nl",
+        "points": 25
+      },
+      {
+        "id": "rf4",
+        "text": "Vraagt bankgegevens te 'bevestigen' via link — overheid doet dit nooit",
+        "points": 20
+      },
+      {
+        "id": "rf5",
+        "text": "Belastingdienst communiceert via MijnOverheid, niet via email-links",
+        "points": 10
+      }
     ],
-    "explanation": "Belastingteruggave-phishing speelt in op hebzucht. De echte Belastingdienst communiceert via MijnOverheid (mijn.overheid.nl) en vraagt nooit bankgegevens te bevestigen via een emaillink."
+    "explanation": "Belastingteruggave-phishing speelt in op hebzucht. De echte Belastingdienst communiceert via MijnOverheid (mijn.overheid.nl) en vraagt nooit bankgegevens te bevestigen via een emaillink.",
+    "category": "Government Phishing"
   },
   {
     "id": 6,
@@ -90,13 +207,34 @@
     "sender_email": "thomas.vermeer@jouwbedrijf-sharepoint.com",
     "body": "Thomas Vermeer heeft een document met u gedeeld.\n\nProjectvoorstel_Q3_definitief.pdf\n\nKlik om te bekijken:\nhttps://jouwbedrijf-sharepoint.com/docs/Projectvoorstel_Q3_definitief.pdf\n\nU moet inloggen met uw Microsoft-account om dit document te openen.\n\nDit bericht is automatisch gegenereerd door SharePoint.",
     "red_flags": [
-      {"id": "rf1", "text": "Domein is jouwbedrijf-sharepoint.com — echte SharePoint gebruikt sharepoint.com of jullie eigen tenant-domein", "points": 25},
-      {"id": "rf2", "text": "Vraagt Microsoft-inloggegevens via externe, nep-SharePoint link", "points": 25},
-      {"id": "rf3", "text": "URL-domein klopt niet (jouwbedrijf-sharepoint.com is geen Microsoft-domein)", "points": 20},
-      {"id": "rf4", "text": "Geen persoonlijke context — waarom deelt Thomas dit document?", "points": 15},
-      {"id": "rf5", "text": "Echte SharePoint-mails komen van *@microsoft.com of jullie eigen tenant", "points": 15}
+      {
+        "id": "rf1",
+        "text": "Domein is jouwbedrijf-sharepoint.com — echte SharePoint gebruikt sharepoint.com of jullie eigen tenant-domein",
+        "points": 25
+      },
+      {
+        "id": "rf2",
+        "text": "Vraagt Microsoft-inloggegevens via externe, nep-SharePoint link",
+        "points": 25
+      },
+      {
+        "id": "rf3",
+        "text": "URL-domein klopt niet (jouwbedrijf-sharepoint.com is geen Microsoft-domein)",
+        "points": 20
+      },
+      {
+        "id": "rf4",
+        "text": "Geen persoonlijke context — waarom deelt Thomas dit document?",
+        "points": 15
+      },
+      {
+        "id": "rf5",
+        "text": "Echte SharePoint-mails komen van *@microsoft.com of jullie eigen tenant",
+        "points": 15
+      }
     ],
-    "explanation": "Nep-SharePoint / OneDrive uitnodigingen zijn populair voor credential harvesting. De inlogpagina ziet er identiek uit aan Microsoft maar stuurt je wachtwoord naar de aanvaller. Verifieer altijd het domein en log in via portal.office.com, niet via emaillinks."
+    "explanation": "Nep-SharePoint / OneDrive uitnodigingen zijn populair voor credential harvesting. De inlogpagina ziet er identiek uit aan Microsoft maar stuurt je wachtwoord naar de aanvaller. Verifieer altijd het domein en log in via portal.office.com, niet via emaillinks.",
+    "category": "Credential Harvesting"
   },
   {
     "id": 7,
@@ -106,13 +244,38 @@
     "sender_email": "hr-salarissen@jouwbedrijf-hr.nl",
     "body": "Beste collega,\n\nZoals besproken in de recente HR-ronde worden salarisgegevens gemigreerd naar ons nieuwe systeem.\n\nOm salarisbetalingen voor juli te garanderen dient u vóór 30 juni uw gegevens te bevestigen:\n- IBAN rekeningnummer\n- BSN-nummer (ter verificatie)\n- Huidig brutomaandsalaris\n\nVul in via: https://jouwbedrijf-hr.nl/salarismigratie/bevestig\n\nMedewerkers die niet reageren kunnen vertraging in salarisontvangst ervaren.\n\nHR Afdeling",
     "red_flags": [
-      {"id": "rf1", "text": "Domein is jouwbedrijf-hr.nl — HR gebruikt altijd het hoofddomein van het bedrijf", "points": 20},
-      {"id": "rf2", "text": "Deadline 30 juni + dreiging van vertraagd salaris = extreme druk", "points": 20},
-      {"id": "rf3", "text": "Externe URL voor gevoelige HR-gegevens — legitieme HR-systemen zijn intern", "points": 20},
-      {"id": "rf4", "text": "Vraagt BSN + IBAN + salaris tegelijk — combinatie bruikbaar voor identiteitsfraude", "points": 25},
-      {"id": "rf5", "text": "'Zoals besproken' — verwijst naar nep-context om vertrouwen te wekken", "points": 10},
-      {"id": "rf6", "text": "Generieke aanhef 'Beste collega' — HR kent je naam", "points": 5}
+      {
+        "id": "rf1",
+        "text": "Domein is jouwbedrijf-hr.nl — HR gebruikt altijd het hoofddomein van het bedrijf",
+        "points": 20
+      },
+      {
+        "id": "rf2",
+        "text": "Deadline 30 juni + dreiging van vertraagd salaris = extreme druk",
+        "points": 20
+      },
+      {
+        "id": "rf3",
+        "text": "Externe URL voor gevoelige HR-gegevens — legitieme HR-systemen zijn intern",
+        "points": 20
+      },
+      {
+        "id": "rf4",
+        "text": "Vraagt BSN + IBAN + salaris tegelijk — combinatie bruikbaar voor identiteitsfraude",
+        "points": 25
+      },
+      {
+        "id": "rf5",
+        "text": "'Zoals besproken' — verwijst naar nep-context om vertrouwen te wekken",
+        "points": 10
+      },
+      {
+        "id": "rf6",
+        "text": "Generieke aanhef 'Beste collega' — HR kent je naam",
+        "points": 5
+      }
     ],
-    "explanation": "HR-phishing is bijzonder gevaarlijk omdat het om BSN, IBAN en salarisdata vraagt — genoeg voor identiteitsfraude. Echte HR-systemen zijn altijd intern toegankelijk. Verifieer altijd bij HR via telefoon of persoonlijk contact voor je zulke gegevens invult."
+    "explanation": "HR-phishing is bijzonder gevaarlijk omdat het om BSN, IBAN en salarisdata vraagt — genoeg voor identiteitsfraude. Echte HR-systemen zijn altijd intern toegankelijk. Verifieer altijd bij HR via telefoon of persoonlijk contact voor je zulke gegevens invult.",
+    "category": "HR Phishing"
   }
 ]

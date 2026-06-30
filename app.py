@@ -263,6 +263,75 @@ def library():
     return render_template('library.html', tactics=tactics)
 
 
+@app.route('/dashboard')
+def dashboard():
+    emails = {e['id']: e for e in load_json('phishing_emails.json')}
+    scenarios = {s['id']: s for s in load_json('scenarios.json')}
+
+    with get_db() as conn:
+        rows = conn.execute('SELECT * FROM scores ORDER BY timestamp DESC').fetchall()
+
+    category_stats = {}
+    difficulty_stats = {'beginner': [], 'intermediate': [], 'advanced': []}
+    total_attempts = len(rows)
+    recent_scores = []
+
+    for r in rows:
+        pct = r['score'] / r['max_score'] * 100 if r['max_score'] else 0
+        if r['quiz_type'] == 'phishing':
+            item = emails.get(r['item_id'])
+            cat = item['category'] if item else 'Onbekend'
+        else:
+            item = scenarios.get(r['item_id'])
+            cat = item['category'] if item else 'Onbekend'
+
+        if cat not in category_stats:
+            category_stats[cat] = {'scores': [], 'quiz_type': r['quiz_type']}
+        category_stats[cat]['scores'].append(pct)
+
+        if r['difficulty'] in difficulty_stats:
+            difficulty_stats[r['difficulty']].append(pct)
+
+        if len(recent_scores) < 10:
+            recent_scores.append({
+                'quiz_type': r['quiz_type'],
+                'category': cat,
+                'difficulty': r['difficulty'],
+                'pct': round(pct),
+                'timestamp': r['timestamp'][:16].replace('T', ' ')
+            })
+
+    category_avgs = {
+        cat: {'avg': round(sum(d['scores']) / len(d['scores']), 1),
+              'attempts': len(d['scores']),
+              'quiz_type': d['quiz_type']}
+        for cat, d in category_stats.items()
+    }
+
+    sorted_cats = sorted(category_avgs.items(), key=lambda x: x[1]['avg'])
+    weakest = sorted_cats[:3]
+    strongest = sorted_cats[-3:][::-1]
+
+    diff_avgs = {
+        d: round(sum(v) / len(v), 1) if v else None
+        for d, v in difficulty_stats.items()
+    }
+
+    overall_avg = round(sum(
+        r['score'] / r['max_score'] * 100 for r in rows if r['max_score']
+    ) / len(rows), 1) if rows else None
+
+    return render_template('dashboard.html',
+        category_avgs=category_avgs,
+        weakest=weakest,
+        strongest=strongest,
+        diff_avgs=diff_avgs,
+        overall_avg=overall_avg,
+        total_attempts=total_attempts,
+        recent_scores=recent_scores
+    )
+
+
 @app.route('/stats')
 def stats():
     with get_db() as conn:
