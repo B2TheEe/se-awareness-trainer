@@ -10,6 +10,16 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-8">
+        <div class="card border-warning mb-2 py-1">
+            <div class="card-body d-flex align-items-center gap-3 py-2">
+                <div class="text-muted small">Tijd</div>
+                <div id="timer-display" style="font-size:1.6rem; font-weight:700; font-variant-numeric: tabular-nums; min-width:3ch;">{{ time_limit }}</div>
+                <div class="progress flex-grow-1" style="height:8px;">
+                    <div id="timer-bar" class="progress-bar bg-warning" style="width:100%"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="card mb-4">
             <div class="card-header"><i class="bi bi-camera-reels"></i> De situatie</div>
             <div class="card-body">
@@ -47,33 +57,80 @@
 </div>
 
 <script>
+const TIME_LIMIT = {{ time_limit }};
+let timeRemaining = TIME_LIMIT;
+let timerInterval = null;
 let answered = false;
 
-function submitAnswer(answerId, btn) {
+function startTimer() {
+    const display = document.getElementById('timer-display');
+    const bar = document.getElementById('timer-bar');
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        display.textContent = timeRemaining;
+        bar.style.width = (timeRemaining / TIME_LIMIT * 100) + '%';
+        if (timeRemaining <= 5) {
+            display.style.color = '#dc3545';
+            bar.className = 'progress-bar bg-danger';
+        } else if (timeRemaining <= 15) {
+            display.style.color = '#fd7e14';
+            bar.className = 'progress-bar bg-warning';
+        }
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            timeOut();
+        }
+    }, 1000);
+}
+
+function timeOut() {
     if (answered) return;
     answered = true;
-
     document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
 
     fetch('/scenarios/{{ scenario.id }}/submit', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({answer: answerId})
+        body: JSON.stringify({answer: null, timed_out: true})
     })
     .then(r => r.json())
-    .then(data => {
-        btn.classList.add(data.correct ? 'correct' : 'wrong');
-
-        document.getElementById('result-icon').textContent = data.correct ? '✅' : '❌';
-        document.getElementById('result-title').textContent = data.correct ? 'Correct!' : 'Niet correct';
-        document.getElementById('result-title').className = data.correct ? 'text-center text-success' : 'text-center text-danger';
-        document.getElementById('result-explanation').textContent = data.explanation;
-        document.getElementById('result-tactic').textContent = data.tactic;
-        document.getElementById('result-lesson').textContent = data.lesson;
-
-        document.getElementById('result-card').classList.remove('d-none');
-        document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
-    });
+    .then(data => showResult(data, null));
 }
+
+function submitAnswer(answerId, btn) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerInterval);
+    document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+    fetch('/scenarios/{{ scenario.id }}/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({answer: answerId, timed_out: false})
+    })
+    .then(r => r.json())
+    .then(data => showResult(data, btn));
+}
+
+function showResult(data, btn) {
+    if (btn) btn.classList.add(data.correct ? 'correct' : 'wrong');
+
+    document.getElementById('result-icon').textContent =
+        data.timed_out ? '⏰' : (data.correct ? '✅' : '❌');
+    document.getElementById('result-title').textContent =
+        data.timed_out ? 'Tijd verstreken!' : (data.correct ? 'Correct!' : 'Niet correct');
+    document.getElementById('result-title').className =
+        data.timed_out ? 'text-center text-warning' :
+        (data.correct ? 'text-center text-success' : 'text-center text-danger');
+
+    document.getElementById('result-explanation').textContent = data.explanation;
+    document.getElementById('result-tactic').textContent = data.tactic;
+    document.getElementById('result-lesson').textContent = data.lesson;
+
+    document.getElementById('result-card').classList.remove('d-none');
+    document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
+}
+
+startTimer();
 </script>
 {% endblock %}

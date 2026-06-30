@@ -8,7 +8,7 @@
 </div>
 
 <div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> Lees de email hieronder. Klik op alle teksten die je verdacht vindt. Elke rode vlag = punten. Foute selecties = strafpunten.
+    <i class="bi bi-info-circle"></i> Lees de email hieronder. Klik op alle teksten die je verdacht vindt. Elke rode vlag = punten. Foute selecties = strafpunten. Sneller = tijdbonus.
 </div>
 
 <div class="row">
@@ -25,12 +25,14 @@
                 {% for line in body.split('\n') %}
                     {% if 'http' in line or 'bit.ly' in line or '.tk' in line or '.online' in line or '.net' in line %}
                         <span class="red-flag-btn" data-flag="rf3" onclick="toggleFlag(this)">{{ line }}</span>
-                    {% elif '24 uur' in line or '48 uur' in line or 'onmiddellijk' in line or 'immediately' in line or 'urgent' in line|lower or 'voor einde' in line %}
+                    {% elif '24 uur' in line or '48 uur' in line or '14 dagen' in line or 'onmiddellijk' in line or 'immediately' in line or 'urgent' in line|lower or 'voor einde' in line or 'voor 30' in line %}
                         <span class="red-flag-btn" data-flag="rf2" onclick="toggleFlag(this)">{{ line }}</span>
-                    {% elif 'verwijderd' in line or 'deleted' in line or 'suspended' in line or 'geblokkeerd' in line %}
+                    {% elif 'verwijderd' in line or 'deleted' in line or 'suspended' in line or 'geblokkeerd' in line or 'vertraging' in line %}
                         <span class="red-flag-btn" data-flag="rf4" onclick="toggleFlag(this)">{{ line }}</span>
                     {% elif line.startswith('Dear') or line.startswith('Beste') or line.startswith('Geachte') %}
                         <span class="red-flag-btn" data-flag="rf5" onclick="toggleFlag(this)">{{ line }}</span>
+                    {% elif 'BSN' in line or 'IBAN' in line or 'bruto' in line or 'rekeningnummer' in line or 'bankgegevens' in line %}
+                        <span class="red-flag-btn" data-flag="rf4" onclick="toggleFlag(this)">{{ line }}</span>
                     {% else %}
                         {{ line }}
                     {% endif %}
@@ -43,6 +45,7 @@
             <div class="card-body text-center">
                 <div id="score-circle" class="score-circle mb-3"></div>
                 <h4 id="result-title"></h4>
+                <div id="time-bonus-badge" class="d-none mb-2"></div>
                 <p id="result-explanation" class="text-muted"></p>
                 <div class="row mt-3">
                     <div class="col-6">
@@ -71,6 +74,16 @@
     </div>
 
     <div class="col-lg-4">
+        <div class="card mb-3 border-warning">
+            <div class="card-body text-center py-2">
+                <div class="text-muted small mb-1">Resterende tijd</div>
+                <div id="timer-display" style="font-size:2rem; font-weight:700; font-variant-numeric: tabular-nums;">{{ time_limit }}</div>
+                <div class="progress mt-2" style="height:6px;">
+                    <div id="timer-bar" class="progress-bar bg-warning" style="width:100%"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header">Geselecteerde rode vlaggen</div>
             <div class="card-body">
@@ -92,13 +105,40 @@
 
 <script>
 const selected = new Set();
+const TIME_LIMIT = {{ time_limit }};
+let timeRemaining = TIME_LIMIT;
+let timerInterval = null;
+let submitted = false;
+
 const flagLabels = {
     {% for rf in email.red_flags %}
     '{{ rf.id }}': '{{ rf.text|replace("'", "\\'") }}',
     {% endfor %}
 };
 
+function startTimer() {
+    const display = document.getElementById('timer-display');
+    const bar = document.getElementById('timer-bar');
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        display.textContent = timeRemaining;
+        bar.style.width = (timeRemaining / TIME_LIMIT * 100) + '%';
+        if (timeRemaining <= 10) {
+            display.style.color = '#dc3545';
+            bar.className = 'progress-bar bg-danger';
+        } else if (timeRemaining <= 30) {
+            display.style.color = '#fd7e14';
+            bar.className = 'progress-bar bg-warning';
+        }
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            submitFlags(true);
+        }
+    }, 1000);
+}
+
 function toggleFlag(el) {
+    if (submitted) return;
     const flag = el.dataset.flag;
     if (selected.has(flag)) {
         selected.delete(flag);
@@ -123,18 +163,22 @@ function updateSidebar() {
     ).join('');
 }
 
-function submitFlags() {
+function submitFlags(timedOut = false) {
+    if (submitted) return;
+    submitted = true;
+    clearInterval(timerInterval);
+    document.getElementById('submit-btn').disabled = true;
+
     fetch('/phishing/{{ email.id }}/submit', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({selected: [...selected]})
+        body: JSON.stringify({selected: [...selected], time_remaining: timeRemaining})
     })
     .then(r => r.json())
-    .then(data => showResult(data));
+    .then(data => showResult(data, timedOut));
 }
 
-function showResult(data) {
-    document.getElementById('submit-btn').disabled = true;
+function showResult(data, timedOut) {
     document.querySelectorAll('.red-flag-btn').forEach(el => el.style.pointerEvents = 'none');
 
     const pct = data.pct;
@@ -142,10 +186,17 @@ function showResult(data) {
     circle.textContent = pct + '%';
     circle.className = 'score-circle mb-3 ' + (pct >= 70 ? 'score-high' : pct >= 40 ? 'score-mid' : 'score-low');
 
+    const prefix = timedOut ? 'Tijd verstreken! ' : '';
     document.getElementById('result-title').textContent =
-        pct >= 70 ? `Goed gedaan! ${data.score}/${data.max_score} punten` :
-        pct >= 40 ? `Aardig! ${data.score}/${data.max_score} punten` :
-        `Meer oefening nodig. ${data.score}/${data.max_score} punten`;
+        prefix + (pct >= 70 ? `Goed gedaan! ${data.total_score}/${data.max_score} punten` :
+        pct >= 40 ? `Aardig! ${data.total_score}/${data.max_score} punten` :
+        `Meer oefening nodig. ${data.total_score}/${data.max_score} punten`);
+
+    if (data.time_bonus > 0) {
+        const badge = document.getElementById('time-bonus-badge');
+        badge.innerHTML = `<span class="badge bg-success fs-6">+${data.time_bonus} tijdbonus</span>`;
+        badge.classList.remove('d-none');
+    }
 
     document.getElementById('result-explanation').textContent = data.explanation;
 
@@ -160,5 +211,7 @@ function showResult(data) {
     document.getElementById('result-card').classList.remove('d-none');
     document.getElementById('result-card').scrollIntoView({behavior: 'smooth'});
 }
+
+startTimer();
 </script>
 {% endblock %}

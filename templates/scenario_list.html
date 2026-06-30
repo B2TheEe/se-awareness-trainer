@@ -2,22 +2,37 @@
 {% block title %}Scenario Quiz{% endblock %}
 {% block content %}
 <h2 class="mb-1">Scenario Quiz</h2>
-<p class="text-muted mb-4">Realistische situaties. Kies de juiste reactie en leer van de uitleg.</p>
+<p class="text-muted mb-2">Realistische situaties. Kies de juiste reactie en leer van de uitleg.</p>
+<div class="alert alert-secondary py-2 mb-4">
+    <i class="bi bi-lock"></i> <strong>Progressie:</strong> intermediate vrijgespeeld na {{ threshold }} beginner ≥50% · advanced na {{ threshold }} intermediate ≥50%
+</div>
 
 <div class="row g-3">
 {% for s in scenarios %}
+{% set locked = s.difficulty not in unlocked %}
 <div class="col-md-6">
-    <div class="card h-100">
+    <div class="card h-100 {% if locked %}opacity-50{% endif %}">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge badge-{{ s.difficulty }}">{{ s.difficulty }}</span>
-                <span class="badge bg-secondary">{{ s.category }}</span>
+                <div>
+                    <span class="badge bg-secondary">{{ s.category }}</span>
+                    {% if locked %}<i class="bi bi-lock-fill text-warning ms-1"></i>{% endif %}
+                </div>
             </div>
             <h5>{{ s.title }}</h5>
+            {% if not locked %}
             <p class="text-muted small">{{ s.scenario[:120] }}...</p>
+            {% else %}
+            <p class="text-muted small"><em>Voltooi eerst {{ threshold }} {{ 'beginner' if s.difficulty == 'intermediate' else 'intermediate' }} scenario's met ≥50%.</em></p>
+            {% endif %}
         </div>
         <div class="card-footer">
+            {% if locked %}
+            <button class="btn btn-outline-secondary btn-sm w-100" disabled><i class="bi bi-lock"></i> Vergrendeld</button>
+            {% else %}
             <a href="/scenarios/{{ s.id }}" class="btn btn-outline-warning btn-sm w-100">Doe dit scenario</a>
+            {% endif %}
         </div>
     </div>
 </div>

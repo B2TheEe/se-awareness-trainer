@@ -33,9 +33,33 @@ def init_db():
         conn.commit()
 
 
+DIFFICULTY_TIME = {'beginner': 120, 'intermediate': 90, 'advanced': 60}
+UNLOCK_THRESHOLD = 2
+UNLOCK_MIN_PCT = 50
+
+
 def load_json(filename):
     with open(os.path.join(DATA_DIR, filename)) as f:
         return json.load(f)
+
+
+def get_unlock_status(quiz_type):
+    """Return set of unlocked difficulty levels for a quiz type."""
+    with get_db() as conn:
+        rows = conn.execute('''
+            SELECT difficulty, COUNT(DISTINCT item_id) as cnt
+            FROM scores
+            WHERE quiz_type = ?
+              AND CAST(score AS FLOAT) / max_score >= ?
+            GROUP BY difficulty
+        ''', (quiz_type, UNLOCK_MIN_PCT / 100)).fetchall()
+    completed = {r['difficulty']: r['cnt'] for r in rows}
+    unlocked = {'beginner'}
+    if completed.get('beginner', 0) >= UNLOCK_THRESHOLD:
+        unlocked.add('intermediate')
+    if completed.get('intermediate', 0) >= UNLOCK_THRESHOLD:
+        unlocked.add('advanced')
+    return unlocked
 
 
 @app.route('/')
@@ -54,7 +78,9 @@ def index():
 @app.route('/phishing')
 def phishing_list():
     emails = load_json('phishing_emails.json')
-    return render_template('phishing_list.html', emails=emails)
+    unlocked = get_unlock_status('phishing')
+    return render_template('phishing_list.html', emails=emails, unlocked=unlocked,
+                           threshold=UNLOCK_THRESHOLD)
 
 
 @app.route('/phishing/<int:email_id>')
@@ -63,7 +89,12 @@ def phishing_sim(email_id):
     email = next((e for e in emails if e['id'] == email_id), None)
     if not email:
         return 'Niet gevonden', 404
-    return render_template('phishing_sim.html', email=email)
+    unlocked = get_unlock_status('phishing')
+    if email['difficulty'] not in unlocked:
+        return render_template('locked.html', difficulty=email['difficulty'],
+                               quiz_type='phishing', threshold=UNLOCK_THRESHOLD), 403
+    time_limit = DIFFICULTY_TIME[email['difficulty']]
+    return render_template('phishing_sim.html', email=email, time_limit=time_limit)
 
 
 @app.route('/phishing/<int:email_id>/submit', methods=['POST'])
@@ -73,7 +104,10 @@ def phishing_submit(email_id):
     if not email:
         return jsonify({'error': 'not found'}), 404
 
-    selected = request.json.get('selected', [])
+    data = request.json
+    selected = data.get('selected', [])
+    time_remaining = max(0, int(data.get('time_remaining', 0)))
+
     all_flag_ids = {rf['id'] for rf in email['red_flags']}
     correct = set(selected) & all_flag_ids
     wrong = set(selected) - all_flag_ids
@@ -83,17 +117,22 @@ def phishing_submit(email_id):
     score = max(0, score - penalty)
     max_score = sum(rf['points'] for rf in email['red_flags'])
 
+    time_bonus = min(30, time_remaining // 4) if score > 0 else 0
+
     with get_db() as conn:
         conn.execute(
             'INSERT INTO scores (quiz_type, item_id, difficulty, score, max_score, timestamp) VALUES (?,?,?,?,?,?)',
-            ('phishing', email_id, email['difficulty'], score, max_score, datetime.utcnow().isoformat())
+            ('phishing', email_id, email['difficulty'], min(score + time_bonus, max_score),
+             max_score, datetime.utcnow().isoformat())
         )
         conn.commit()
 
     result = {
         'score': score,
+        'time_bonus': time_bonus,
+        'total_score': min(score + time_bonus, max_score),
         'max_score': max_score,
-        'pct': round(score / max_score * 100),
+        'pct': round(min(score + time_bonus, max_score) / max_score * 100),
         'correct_flags': [rf for rf in email['red_flags'] if rf['id'] in correct],
         'missed_flags': [rf for rf in email['red_flags'] if rf['id'] not in correct],
         'wrong_count': len(wrong),
@@ -105,7 +144,9 @@ def phishing_submit(email_id):
 @app.route('/scenarios')
 def scenario_list():
     scenarios = load_json('scenarios.json')
-    return render_template('scenario_list.html', scenarios=scenarios)
+    unlocked = get_unlock_status('scenario')
+    return render_template('scenario_list.html', scenarios=scenarios, unlocked=unlocked,
+                           threshold=UNLOCK_THRESHOLD)
 
 
 @app.route('/scenarios/<int:scenario_id>')
@@ -114,7 +155,12 @@ def scenario_quiz(scenario_id):
     scenario = next((s for s in scenarios if s['id'] == scenario_id), None)
     if not scenario:
         return 'Niet gevonden', 404
-    return render_template('scenario_quiz.html', scenario=scenario)
+    unlocked = get_unlock_status('scenario')
+    if scenario['difficulty'] not in unlocked:
+        return render_template('locked.html', difficulty=scenario['difficulty'],
+                               quiz_type='scenarios', threshold=UNLOCK_THRESHOLD), 403
+    time_limit = DIFFICULTY_TIME[scenario['difficulty']]
+    return render_template('scenario_quiz.html', scenario=scenario, time_limit=time_limit)
 
 
 @app.route('/scenarios/<int:scenario_id>/submit', methods=['POST'])
@@ -124,12 +170,25 @@ def scenario_submit(scenario_id):
     if not scenario:
         return jsonify({'error': 'not found'}), 404
 
-    chosen = request.json.get('answer')
+    data = request.json
+    chosen = data.get('answer')
+    timed_out = data.get('timed_out', False)
     option = next((o for o in scenario['options'] if o['id'] == chosen), None)
-    if not option:
-        return jsonify({'error': 'invalid answer'}), 400
 
-    score = 100 if option['correct'] else 0
+    if timed_out:
+        score = 0
+        correct = False
+        explanation = 'Tijd verstreken — geen antwoord gegeven.'
+        lesson = scenario['lesson']
+        tactic = scenario['tactic']
+    else:
+        if not option:
+            return jsonify({'error': 'invalid answer'}), 400
+        score = 100 if option['correct'] else 0
+        correct = option['correct']
+        explanation = option['explanation']
+        lesson = scenario['lesson']
+        tactic = scenario['tactic']
 
     with get_db() as conn:
         conn.execute(
@@ -139,10 +198,11 @@ def scenario_submit(scenario_id):
         conn.commit()
 
     return jsonify({
-        'correct': option['correct'],
-        'explanation': option['explanation'],
-        'lesson': scenario['lesson'],
-        'tactic': scenario['tactic'],
+        'correct': correct,
+        'timed_out': timed_out,
+        'explanation': explanation,
+        'lesson': lesson,
+        'tactic': tactic,
         'score': score
     })
 
